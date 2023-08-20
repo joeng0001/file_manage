@@ -1,10 +1,25 @@
 import { Schema, model, models } from 'mongoose';
 
 const FileSchema = new Schema({
-  inodeNumber: {
-    type: String,
-    unique: [true, 'file inode number already exists!'],
-    required: [true, 'file inode number is required!'],
+  course:{
+    type:String,
+    default:['no course']
+  },
+  fileName:{
+    type:String,
+    required:[true,'fileNmae is required'],
+  },
+  secured:{
+    type:Boolean,
+    default:false
+  },
+  encrypted:{
+    type:Boolean,
+    default:false
+  },
+  comments:{
+    type:String,
+    default:['']
   },
   remarks:{
     type:String,
