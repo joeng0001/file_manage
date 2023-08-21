@@ -22,6 +22,7 @@
     "next": "13.4.16",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-icons": "^4.10.1",
     "uploadthing": "^5.3.3"
   },
   "devDependencies": {
