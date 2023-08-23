@@ -14,7 +14,7 @@ export default function RootLayout({ children }){
     return (
        <ClerkProvider >
             <html lang="en">
-                <body suppressHydrationWarning={true} className={`${inter.className}`}>
+                <body suppressHydrationWarning={true} className={`${inter.className} AuthBackground` }>
                     {children}
                 </body>
             </html>

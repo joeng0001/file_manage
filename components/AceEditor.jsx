@@ -23,9 +23,7 @@ export default function AceEditorCom(props) {
     const [content,setContent]=useState()
     const [comment,setComment]=useState()
 
-    useEffect(() => {
-        
-    }, [])
+
 
     useEffect(() => {
 
@@ -40,7 +38,7 @@ export default function AceEditorCom(props) {
                 value={content}
                 fontSize={14}
                 onChange={(e,v)=>setContent(v)}
-                style={{ height: '200px', width: '95%', marginBottom: '5px' }}
+                style={{ height: '200px', width: '95%',marginTop:'100px', marginBottom: '5px' }}
             />
             <AceEditor
                 mode="html"

@@ -102,3 +102,23 @@
     margin-top: 5px;
     margin-bottom: 5px;
   }
+
+  #movingSpan {
+    position: absolute;
+    top:240px;
+    animation: moveSpan 10s infinite;
+    border:1px solid red;
+  }
+
+  @keyframes moveSpan {
+    0% {
+      left: 0;
+    }
+    50% {
+      left: calc(100% - 100px);
+    }
+    100% {
+      left: 0;
+    }
+  }
+
