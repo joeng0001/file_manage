@@ -12,6 +12,7 @@ import  SearchIcon  from "@mui/icons-material/Search";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import InboxIcon from "@mui/icons-material/Inbox"
 import { styled, useTheme } from '@mui/material/styles';
+import Link from "next/link";
 export default function header(){
     const router=useRouter()
     const [drawer,setDrawer]=useState(false)
@@ -120,12 +121,16 @@ export default function header(){
                 <Box sx={{ flexGrow: 1,flexDirection:'column' }} />
                 <List>
                     <ListItem  disablePadding>
+                        
                         <ListItemButton>
-                            <ListItemIcon>
+                            <Link href="/about" style={{textDecoration:'none',outline:'none',display:'flex'}}>
+                            <ListItemIcon onClick={()=>router.push('/about')}>
                             <InboxIcon />
                             </ListItemIcon>
-                            <ListItemText primary={"seek help"} />
+                            <ListItemText primary={"about"} />
+                            </Link>
                         </ListItemButton>
+                       
                     </ListItem>
                 </List>    
                 <List>

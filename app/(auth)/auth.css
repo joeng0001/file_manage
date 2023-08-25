@@ -2,7 +2,7 @@
     position:absolute;
     height:100%;
     width:100%;
-    background-image: url('/assets/loginBackground.jpg') ;
+    background-image: url('/assets/authBackGround.png') ;
 
 
     background-size: cover;
@@ -194,4 +194,20 @@
     50%,100%{
         bottom: 100% ;
     }
+}
+
+.card:hover .card-side.front{
+    transform:rotateY(180deg);
+}
+.card:hover .card-side.back{
+    transform:rotateY(0deg);
+}
+
+.card{
+    perspective:150rem;
+    position:relative;
+    height:40rem;
+    max-width:2rem;
+    box-shadow:none;
+    background: none;
 }

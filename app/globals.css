@@ -1,124 +1,159 @@
-
 .loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 3rem;
-    border: 2px solid;
-    margin: 10%;
-    padding: 20px;
-    border-radius: 10px;
-    animation: border-color 3s infinite ease-in-out;
-  }
-  
-  .loading span {
-    animation: jump 1s ease-in-out infinite;
-  }
-  
-  .loading span:nth-child(1) {
-    animation-delay: 0s;
-    color: #ff6f61;
-  }
-  
-  .loading span:nth-child(2) {
-    animation-delay: 0.1s;
-    color: #fdbc40;
-  }
-  
-  .loading span:nth-child(3) {
-    animation-delay: 0.2s;
-    color: #34c3eb;
-  }
-  
-  .loading span:nth-child(4) {
-    animation-delay: 0.3s;
-    color: #4c80c9;
-  }
-  
-  .loading span:nth-child(5) {
-    animation-delay: 0.4s;
-    color: #f4a261;
-  }
-  
-  .loading span:nth-child(6) {
-    animation-delay: 0.5s;
-    color: #ff0eff;
-  }
-  
-  @keyframes jump {
-    0% {
-      transform: translateY(0);
-    }
-  
-    50% {
-      transform: translateY(-1rem);
-    }
-  
-    100% {
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes border-color {
-    0% {
-      border-color: #ff6f61;
-    }
-  
-    25% {
-      border-color: #fdbc40;
-    }
-  
-    50% {
-      border-color: #34c3eb;
-    }
-  
-    75% {
-      border-color: #4c80c9;
-    }
-  
-    100% {
-      border-color: #f4a261;
-    }
-  }
-  
-  .loading-spinner {
-    border: 5px solid rgba(0, 0, 0, 0.1);
-    border-top-color: #007aff;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    position: relative;
-    left: 50%;
-    animation: spin 1s linear infinite;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
-  .marginOnY {
-    margin-top: 5px;
-    margin-bottom: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  border: 2px solid;
+  margin: 10%;
+  padding: 20px;
+  border-radius: 10px;
+  animation: border-color 3s infinite ease-in-out;
+}
+
+.loading span {
+  animation: jump 1s ease-in-out infinite;
+}
+
+.loading span:nth-child(1) {
+  animation-delay: 0s;
+  color: #ff6f61;
+}
+
+.loading span:nth-child(2) {
+  animation-delay: 0.1s;
+  color: #fdbc40;
+}
+
+.loading span:nth-child(3) {
+  animation-delay: 0.2s;
+  color: #34c3eb;
+}
+
+.loading span:nth-child(4) {
+  animation-delay: 0.3s;
+  color: #4c80c9;
+}
+
+.loading span:nth-child(5) {
+  animation-delay: 0.4s;
+  color: #f4a261;
+}
+
+.loading span:nth-child(6) {
+  animation-delay: 0.5s;
+  color: #ff0eff;
+}
+
+@keyframes jump {
+  0% {
+    transform: translateY(0);
   }
 
-  #movingSpan {
-    position: absolute;
-    top:240px;
-    animation: moveSpan 10s infinite;
-    border:1px solid red;
+  50% {
+    transform: translateY(-1rem);
   }
 
-  @keyframes moveSpan {
-    0% {
-      left: 0;
-    }
-    50% {
-      left: calc(100% - 100px);
-    }
-    100% {
-      left: 0;
-    }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes border-color {
+  0% {
+    border-color: #ff6f61;
   }
 
+  25% {
+    border-color: #fdbc40;
+  }
+
+  50% {
+    border-color: #34c3eb;
+  }
+
+  75% {
+    border-color: #4c80c9;
+  }
+
+  100% {
+    border-color: #f4a261;
+  }
+}
+
+.loading-spinner {
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #007aff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  left: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.marginOnY {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+body {
+  width: 100%;
+  margin: 0;
+}
+
+.aboutBackground {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-image: url('/assets/aboutBackGround.png');
+
+
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.card-side.back {
+  transform: rotateY(-180deg);
+  background-color: #4158D0;
+  background-image: linear-gradient(43deg, #4158D0 0%,#C850C0 46%, #FFCC70 100%);
+}
+.card-side.front {
+  background-color: #0093E9;
+  background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+}
+
+.card:hover .card-side.front {
+  transform: rotateY(180deg);
+}
+
+.card:hover .card-side.back {
+  transform: rotateY(0deg);
+}
+.card {
+  perspective: 150rem;
+  margin: 2em auto;
+  height: 40rem;
+  max-width: 400px;
+  box-shadow: none;
+  background: none;
+}
+.card-side {
+  height: 25rem;
+  border-radius: 15px;
+  transition: all 0.8s ease;
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 80%;
+  padding: 2rem;
+  color: white;
+}
