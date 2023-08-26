@@ -10,11 +10,9 @@ import { Grid, Box } from '@mui/material'
 import { SiCsharp, SiJavascript, SiPhp } from "react-icons/si";
 import { DiJava, DiPython, DiHtml5, DiCss3, DiRuby, DiSwift, DiRust } from "react-icons/di"
 import { BsFiletypeTxt, BsCardImage ,BsFiletypePdf,BsFiletypeDoc} from "react-icons/bs"
-export default function Home() {
-  // const router=useRouter()
-  // const pathname =usePathname()
 
-  //console.log(pathname)
+export default function Home() {
+ 
 
   return (
     <div className="homeBackGround">

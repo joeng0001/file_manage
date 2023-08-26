@@ -5,11 +5,11 @@ const FileSchema = new Schema({
     type:String,
     requried:[true,'each file belongs to a folder']
   },
-  fileName:{
+  name:{
     type:String,
     required:[true,'fileName is required'],
   },
-  fileType:{
+  type:{
     type:String,
     required:[true,"file MIME type is missing"]
   },

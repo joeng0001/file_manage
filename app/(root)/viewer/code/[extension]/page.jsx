@@ -1,5 +1,7 @@
-import AceEditor from '@/components/AceEditor'
+"use client"
 
+import AceEditor from '@/components/AceEditor'
+import {motion} from "framer-motion"
 
 
 export default function showByLanguage({params}){
@@ -13,9 +15,19 @@ export default function showByLanguage({params}){
     return (
         <div>
             edit...
-            <div>
+            <motion.div
+                initial={{
+                    x:1000
+                }}
+                animate={{
+                    x:0
+                }}
+                transition={{
+                    duration:2
+                }}
+            >
                 php python java
-            </div>
+            </motion.div>
             <AceEditor/>
         </div>
     )
