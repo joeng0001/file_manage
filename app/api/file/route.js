@@ -4,12 +4,11 @@ import { connectToDB } from "@/utils/database";
 
 
 export const GET = async (request, { params }) => {
-
+    const req=await request.json()
     try {
         await connectToDB()
-
-        const files = await File.find({})
-        return new Response(JSON.stringify(files), { status: 200 })
+        const file = await File.find({_id:req._id})
+        return new Response(JSON.stringify(file), { status: 200 })
     } catch (error) {
         return new Response("Failed to fetch prompts created by user", { status: 500 })
     }
@@ -35,7 +34,6 @@ export const POST = async (request, { params }) => {
             console.error(error);
           }
           return new Response(JSON.stringify({ data: "success" }), { status: 200 })
-        return new Response(JSON.stringify(file), { status: 200 })
     } catch (error) {
         return new Response("Failed to fetch prompts created by user", { status: 500 })
     }

@@ -1,21 +1,21 @@
 import { Schema, model, models } from 'mongoose';
 
 const FileSchema = new Schema({
-  course:{
+  parentFolderId:{
     type:String,
-    default:['no course']
+    requried:[true,'each file belongs to a folder']
   },
   fileName:{
     type:String,
-    required:[true,'fileNmae is required'],
+    required:[true,'fileName is required'],
   },
   fileType:{
     type:String,
     required:[true,"file MIME type is missing"]
   },
-  secured:{
-    type:Boolean,
-    default:false
+  base64String:{
+    type:String,
+    required:[true,'file content is required']
   },
   encrypted:{
     type:Boolean,
