@@ -9,6 +9,10 @@ const FileSchema = new Schema({
     type:String,
     required:[true,'fileNmae is required'],
   },
+  fileType:{
+    type:String,
+    required:[true,"file MIME type is missing"]
+  },
   secured:{
     type:Boolean,
     default:false

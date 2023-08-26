@@ -15,7 +15,7 @@ export const GET = async (request, { params }) => {
     }
 } 
 
-export const Post = async (request, { params }) => {
+export const POST = async (request, { params }) => {
     try {
         await connectToDB()
 
@@ -34,8 +34,13 @@ export const Post = async (request, { params }) => {
           } catch (error) {
             console.error(error);
           }
+          return new Response(JSON.stringify({ data: "success" }), { status: 200 })
         return new Response(JSON.stringify(file), { status: 200 })
     } catch (error) {
         return new Response("Failed to fetch prompts created by user", { status: 500 })
     }
-} 
+}
+
+export const PUT =async (request)=>{
+    
+}
