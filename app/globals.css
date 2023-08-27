@@ -167,7 +167,7 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   background-attachment: fixed;
-
+  padding-top:5px;
   color:white;
   font-family: Arial, sans-serif;
 }
@@ -183,9 +183,39 @@ body {
   
 }
 
+.Box:hover{
+  background-color: rgba(255,255,255,0.1);
+}
+
 .disableLinkStyle{
   text-decoration:none;
   outline:none;
   color:white;
 }
 
+.footerContainer{
+  position:fixed;
+  bottom:0;
+  text-align: center;
+  display:flex;
+  justify-content: center;
+  background-color: gray;
+  color:black;
+  width:100%;
+}
+
+.toolbar{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  color:#b0fff2;
+  min-width:15vw;
+  height:100%;
+  margin-left:10px;
+  margin-right:10px;
+}
+
+.HidedButton{
+  visibility: hidden;
+  width: 0px;
+}
