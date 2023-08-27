@@ -1,7 +1,7 @@
 export default function footer(){
     return(
         <div className="footerContainer">
-            Joe All right reserved
+            Joe Ng © All right reserved
         </div>
     )
 }

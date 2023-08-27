@@ -1,5 +1,5 @@
 "use client"
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField,Snackbar,Alert } from "@mui/material"
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert } from "@mui/material"
 import { useState, useRef } from "react"
 
 import ApiLoading from "@/components/ApiLoading"
@@ -9,15 +9,61 @@ export default function toolbar(props) {
     const [folderDialog, setFolderDialog] = useState(false)
     const [confirmDialog, setConfirmDialog] = useState(false)
 
-    const [snackbarOpen,setSnackbarOpen]=useState(false)
-    const [snackbarSeverity,setSnackbarSeverity]=useState('success')
-    const [snackbarMessage,setSnackbarMessage]=useState("")
+    const [snackbarOpen, setSnackbarOpen] = useState(false)
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success')
+    const [snackbarMessage, setSnackbarMessage] = useState("")
 
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState({})
-    const inputRef = useRef()
+    const [inputRef,fileRef,folderRef] = [useRef(),useRef(),useRef()]
+    const createFile = async () => {
+        setLoading(true)
+        //create file,then redirect user to edit page to contuinue the creation
+        await fetch('/api/file',
+            {
+                method: "POST",
+                body: JSON.stringify({
+                  name:fileRef.current.value,
+                  
+                })
+            }).then(res => {
+                setSnackbarSeverity("success")
+                setSnackbarMessage("created")
+                setSnackbarOpen(true)
+                setFileDialog(false)
+            }).catch(err => {
+                setSnackbarSeverity("error")
+                setSnackbarMessage("Error!" + err.message)
+                setSnackbarOpen(true)
+            }).finally(() => {
+                setLoading(false)
+            })
+    }
+    const createFolder = async () => {
+        setLoading(true)
+        await fetch('/api/file',
+            {
+                method: "POST",
+                body: JSON.stringify({
+                  name:folderRef.current.value,
+                  
+                })
+            }).then(res => {
+                setSnackbarSeverity("success")
+                setSnackbarMessage("created")
+                setSnackbarOpen(true)
+                setFolderDialog(false)
+            }).catch(err => {
+                setSnackbarSeverity("error")
+                setSnackbarMessage("Error!" + err.message)
+                setSnackbarOpen(true)
+            }).finally(() => {
+                setLoading(false)
+            })
+        setLoading(false)
+    }
+
     const fileSelect = async (e) => {
-        //preview the file
         if (e.target.files) {
             const targetFile = e.target.files[0]
             const reader = new FileReader();
@@ -38,28 +84,27 @@ export default function toolbar(props) {
             }
         }
     }
-
     const fileUpload = async () => {
         setLoading(true)
         await fetch('/api/file',
             {
                 method: "POST",
                 body: JSON.stringify({ file })
-            }).then(res=>{
+            }).then(res => {
                 setSnackbarSeverity("success")
                 setSnackbarMessage("upload success")
                 setSnackbarOpen(true)
                 setConfirmDialog(false)
-            }).catch(err=>{
+            }).catch(err => {
                 setSnackbarSeverity("error")
-                setSnackbarMessage("Error!"+err.message)
+                setSnackbarMessage("Error!" + err.message)
                 setSnackbarOpen(true)
-            }).finally(()=>{
+            }).finally(() => {
                 setFile(null)
                 setLoading(false)
             })
     }
-    const cancelUpload=()=>{
+    const cancelUpload = () => {
         setFile(null)
         setSnackbarSeverity("warning")
         setSnackbarMessage("Upload Cancelled")
@@ -71,11 +116,12 @@ export default function toolbar(props) {
             <div className="toolbar">
 
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setFileDialog(true)}>Create File(text only)</Button>
-                <Button variant="outlined" style={{ marginBottom: '10px' }}>Create Folder</Button>
+                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setFolderDialog(true)}>Create Folder</Button>
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => { inputRef.current.click() }}>
                     Upload File
                     <input ref={inputRef} type='file' accept=".jpg, .pdf, .png, .doc, .docx, .txt, .html, .css, .js, .py"
                         onChange={(e) => fileSelect(e)} className="HidedButton" />
+                    
                 </Button>
 
             </div>
@@ -88,29 +134,51 @@ export default function toolbar(props) {
                 <DialogTitle>
                     Create File
                 </DialogTitle>
-                <DialogContent>
-                    <TextField label="File Name" variant="outlined" />
-                </DialogContent>
-                <DialogActions>
-                    <Button>Back</Button>
-                    <Button>Create</Button>
-                </DialogActions>
+                {
+                    loading ?
+                        <DialogContent>
+                            <ApiLoading />
+                        </DialogContent>
+                        :
+                        <div>
+                            <DialogContent>
+                                <TextField inputRef={fileRef} label="File Name" variant="outlined" />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setFileDialog(false)}>Back</Button>
+                                <Button onClick={createFile}>Create</Button>
+                            </DialogActions>
+                        </div>
+                }
             </Dialog>
             <Dialog
                 fullWidth={true}
                 maxWidth='sm'
-                open={fileDialog}
+                open={folderDialog}
             >
                 <DialogTitle>
                     Create Folder
                 </DialogTitle>
-                <DialogContent>
-                    <TextField label="Folder Name" variant="outlined" />
-                </DialogContent>
-                <DialogActions>
-                    <Button>Back</Button>
-                    <Button>Create</Button>
-                </DialogActions>
+
+                {
+                    loading ?
+                        <DialogContent>
+                            <ApiLoading />
+                        </DialogContent>
+                        :
+                        <div>
+                            <DialogContent>
+                                <TextField inputRef={folderRef} label="Folder Name" variant="outlined" />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setFolderDialog(false)}>Back</Button>
+                                <Button onClick={createFolder}>Create</Button>
+                            </DialogActions>
+                        </div>
+                }
+
+
+
             </Dialog>
             <Dialog
                 fullWidth={true}
@@ -129,8 +197,8 @@ export default function toolbar(props) {
                         <div>
 
                             <DialogContent>
-                                Upload file <span style={{fontSize:'18px'}}>
-                                {file?.name} 
+                                Upload file <span style={{ fontSize: '18px' }}>
+                                    {file?.name}
                                 </span>
                                 ?
                             </DialogContent>
@@ -142,7 +210,7 @@ export default function toolbar(props) {
                 }
 
             </Dialog>
-            <Snackbar open={snackbarOpen} autoHideDuration={5000} anchorOrigin={{ vertical:'top', horizontal:'center' }}>
+            <Snackbar open={snackbarOpen} autoHideDuration={5000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
                 <Alert severity={snackbarSeverity} sx={{ width: '100%' }}>
                     {snackbarMessage}
                 </Alert>
