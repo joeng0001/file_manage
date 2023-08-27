@@ -8,7 +8,7 @@ export default function fileList({ params, searchParams }) {
     const level = types.length
     //console.log(params,searchParams)
     //console.log(item)
-
+    
     const folderList = []
     const fileList = []
 
@@ -25,7 +25,7 @@ export default function fileList({ params, searchParams }) {
                         </Link>
                     </Grid>
                 </Grid>
-                <Toolbar path="path here"/>
+                <Toolbar path={types.join("/")}/>
             </div>
 
         </div>

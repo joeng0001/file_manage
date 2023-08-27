@@ -29,8 +29,8 @@ const FileSchema = new Schema({
     type:String,
   },
   createdBy: {
-    type: mongoose.Schema.Types.email,
-    ref: "User",
+    type: String,
+    
   },
   createdAt:{
     type:Date,
