@@ -160,9 +160,26 @@ body {
 
 .homeBackGround{
   position: absolute;
+
+
   height: 100%;
   width: 100%;
   background: linear-gradient(to right, #575656, #0b102e);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+  padding-top:5px;
+  color:white;
+  font-family: Arial, sans-serif;
+
+}
+
+.fileViewerBackGround{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(to left, #575656, #0b102e);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

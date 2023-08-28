@@ -1,6 +1,8 @@
 import { Grid, Box} from "@mui/material"
 import Link from "next/link"
 import Toolbar from "@/components/Toolbar"
+import {FcOpenedFolder,FcFile} from "react-icons/fc"
+
 export default function fileList({ params, searchParams }) {
 
     const types = params?.type
@@ -20,6 +22,15 @@ export default function fileList({ params, searchParams }) {
                     <Grid item xs={4}>
                         <Link href="/folderViewer/csharp/?page=1" className="disableLinkStyle">
                             <Box className="Box">
+                                <FcOpenedFolder/>
+                                <div>C#</div>
+                            </Box>
+                        </Link>
+                    </Grid>
+                    <Grid item xs={4}>
+                        <Link href="/folderViewer/csharp/?page=1" className="disableLinkStyle">
+                            <Box className="Box">
+                                <FcFile/>
                                 <div>C#</div>
                             </Box>
                         </Link>

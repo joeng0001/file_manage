@@ -1,6 +1,7 @@
 "use client"
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert } from "@mui/material"
 import { useState, useRef } from "react"
+import {MdFileUpload,PiFolderPlusBold,PiFilePlusBold}
 
 import ApiLoading from "@/components/ApiLoading"
 export default function toolbar(props) {
@@ -15,7 +16,7 @@ export default function toolbar(props) {
 
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState({})
-    const [inputRef,fileRef,folderRef] = [useRef(),useRef(),useRef()]
+    const [inputRef,fileRef,folderRef,fileRemarkRef,folderRemarkRef] = [useRef(),useRef(),useRef(),useRef(),useRef()]
     const createFile = async () => {
         setLoading(true)
         //create file,then redirect user to edit page to contuinue the creation
@@ -24,7 +25,7 @@ export default function toolbar(props) {
                 method: "POST",
                 body: JSON.stringify({
                   name:fileRef.current.value,
-                  
+                  remarks:fileRemarkRef.current.value
                 })
             }).then(res => {
                 setSnackbarSeverity("success")
@@ -46,7 +47,7 @@ export default function toolbar(props) {
                 method: "POST",
                 body: JSON.stringify({
                   name:folderRef.current.value,
-                  
+                  remarks:folderRemarkRef.current.value
                 })
             }).then(res => {
                 setSnackbarSeverity("success")
@@ -115,10 +116,10 @@ export default function toolbar(props) {
         <div>
             <div className="toolbar">
 
-                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setFileDialog(true)}>Create File(text only)</Button>
-                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setFolderDialog(true)}>Create Folder</Button>
+                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setFileDialog(true)}><PiFilePlusBold/>Create File</Button>
+                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setFolderDialog(true)}><PiFolderPlusBold/>Create Folder</Button>
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => { inputRef.current.click() }}>
-                    Upload File
+                    <MdFileUpload/>Upload File
                     <input ref={inputRef} type='file' accept=".jpg, .pdf, .png, .doc, .docx, .txt, .html, .css, .js, .py"
                         onChange={(e) => fileSelect(e)} className="HidedButton" />
                     
@@ -143,6 +144,7 @@ export default function toolbar(props) {
                         <div>
                             <DialogContent>
                                 <TextField inputRef={fileRef} label="File Name" variant="outlined" />
+                                <TextField inputRef={fileRemarkRef} label="Remarks..." variant="outlined" color="secondary" />
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setFileDialog(false)}>Back</Button>
@@ -169,6 +171,7 @@ export default function toolbar(props) {
                         <div>
                             <DialogContent>
                                 <TextField inputRef={folderRef} label="Folder Name" variant="outlined" />
+                                <TextField inputRef={folderRemarkRef} label="Remarks..." variant="outlined" color="secondary"/>
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setFolderDialog(false)}>Back</Button>

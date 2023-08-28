@@ -1,6 +1,6 @@
 "use client"
 
-import AceEditor from '@/components/AceEditor'
+import AceEditor from '@/components/Editor/AceEditor'
 import {motion} from "framer-motion"
 import {Cursor,useTypewriter}from 'react-simple-typewriter'
 
@@ -11,8 +11,8 @@ export default function showByLanguage({params}){
 
     const [text,count]=useTypewriter({
         words:[
-            "Hi edit your code here",
-            "welcome to my website"
+            "Edit your code file here",
+            "Welcome!"
         ],
         loop:true,
         delaySpeed:2000
