@@ -3,6 +3,7 @@
 import AceEditor from '@/components/Editor/AceEditor'
 import {motion} from "framer-motion"
 import {Cursor,useTypewriter}from 'react-simple-typewriter'
+import Decoration from '@/components/DecorationFloadtingBtn'
 
 export default function showByLanguage({params}){
 
@@ -36,9 +37,9 @@ export default function showByLanguage({params}){
                     duration:2
                 }}
             >
-                php python java
+                <Decoration/>
             </motion.div>
-            <AceEditor/>
+            <AceEditor />
         </div>
     )
 }

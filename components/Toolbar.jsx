@@ -1,14 +1,15 @@
 "use client"
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert } from "@mui/material"
 import { useState, useRef } from "react"
-import {MdFileUpload,PiFolderPlusBold,PiFilePlusBold}
-
+import {PiFolderPlusBold,PiFilePlusBold} from 'react-icons/pi'
+import {MdComment,MdFileUpload} from 'react-icons/md'
 import ApiLoading from "@/components/ApiLoading"
 export default function toolbar(props) {
 
     const [fileDialog, setFileDialog] = useState(false)
     const [folderDialog, setFolderDialog] = useState(false)
     const [confirmDialog, setConfirmDialog] = useState(false)
+    const [commentsDialog,setCommentsDialog]=useState(false)
 
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
@@ -16,7 +17,7 @@ export default function toolbar(props) {
 
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState({})
-    const [inputRef,fileRef,folderRef,fileRemarkRef,folderRemarkRef] = [useRef(),useRef(),useRef(),useRef(),useRef()]
+    const [inputRef,fileRef,folderRef,fileRemarkRef,folderRemarkRef,commentsRef] = [useRef(),useRef(),useRef(),useRef(),useRef(),useRef()]
     const createFile = async () => {
         setLoading(true)
         //create file,then redirect user to edit page to contuinue the creation
@@ -112,6 +113,26 @@ export default function toolbar(props) {
         setSnackbarOpen(true)
         setConfirmDialog(false)
     }
+
+    const saveComments=async()=>{
+        setLoading(true)
+        await fetch('/api/folder',
+            {
+                method: "PUT",
+                body: JSON.stringify({ comment: commentsRef.current.value})
+            }).then(res => {
+                setSnackbarSeverity("success")
+                setSnackbarMessage("upload success")
+                setSnackbarOpen(true)
+            }).catch(err => {
+                setSnackbarSeverity("error")
+                setSnackbarMessage("Error!" + err.message)
+                setSnackbarOpen(true)
+            }).finally(() => {
+                setCommentsDialog(false)
+                setLoading(false)
+            })
+    }
     return (
         <div>
             <div className="toolbar">
@@ -123,11 +144,12 @@ export default function toolbar(props) {
                     <input ref={inputRef} type='file' accept=".jpg, .pdf, .png, .doc, .docx, .txt, .html, .css, .js, .py"
                         onChange={(e) => fileSelect(e)} className="HidedButton" />
                     
-                </Button>
+                </Button>s
+                <Button variant="outlined" style={{marginBottom:'10px'}} onClick={()=>setCommentsDialog(true)}><MdComment/>Edit Comment</Button>
 
             </div>
             <Dialog
-
+ ds
                 fullWidth={true}
                 maxWidth='sm'
                 open={fileDialog}
@@ -179,9 +201,6 @@ export default function toolbar(props) {
                             </DialogActions>
                         </div>
                 }
-
-
-
             </Dialog>
             <Dialog
                 fullWidth={true}
@@ -212,6 +231,32 @@ export default function toolbar(props) {
                         </div>
                 }
 
+            </Dialog>
+            <Dialog
+                fullWidth={true}
+                maxWidth='sm'
+                open={remarksDialog}
+            >
+                <DialogTitle>
+                    Edit Comment
+                </DialogTitle>
+
+                {
+                    loading ?
+                        <DialogContent>
+                            <ApiLoading />
+                        </DialogContent>
+                        :
+                        <div>
+                            <DialogContent>
+                                <TextField inputRef={commentsRef} label="Comment..." variant="outlined" color="secondary"/>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setCommentsDialog(false)}>Back</Button>
+                                <Button onClick={saveComments}>Save</Button>
+                            </DialogActions>
+                        </div>
+                }
             </Dialog>
             <Snackbar open={snackbarOpen} autoHideDuration={5000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
                 <Alert severity={snackbarSeverity} sx={{ width: '100%' }}>

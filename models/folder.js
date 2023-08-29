@@ -5,7 +5,7 @@ const FolderSchema = new Schema({
     type:String,
     require:[true,'folder name is required']
   },
-  rootFolderId:{
+  parentFolderId:{
     type:String,
     require:[true,'each folder must belongs to parent folder']
   },
