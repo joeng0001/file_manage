@@ -1,17 +1,22 @@
-import { Schema, model, models } from 'mongoose';
+import { Schema, model, models,SchemaType } from 'mongoose';
 
 const FolderSchema = new Schema({
   name:{
     type:String,
-    require:[true,'folder name is required']
+    require:[true,'folder name is required'],
+    validate:{
+      validator:v=>v.includes('/'),
+      message:props => `${props.value} include invalid character`
+    }
   },
   parentFolderId:{
-    type:String,
+    type:SchemaType.ObjectId,
     require:[true,'each folder must belongs to parent folder']
   },
   level:{
     type:Number,
-    require:[true,'each folder has a level identifier']
+    require:[true,'each folder has a level identifier'],
+    min:1,
   },
   folderList:{
     type:Array,
@@ -30,14 +35,16 @@ const FolderSchema = new Schema({
   createdBy: {
     type: mongoose.Schema.Types.email,
     ref: "User",
+    immutable:true,
   },
   createdAt:{
     type:Date,
-    default:new Date()
+    default:()=>Date.now(),
+    immutable:true,
   },
   modifiedAt:{
     type:Date,
-    default:new Date()
+    default:()=>Date.now()
   }
 });
 

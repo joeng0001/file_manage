@@ -1,8 +1,8 @@
-import { Schema, model, models } from 'mongoose';
+import { Schema, model, models ,SchemaType} from 'mongoose';
 
 const FileSchema = new Schema({
   parentFolderId:{
-    type:String,
+    type:SchemaType.ObjectId,
     requried:[true,'each file belongs to a folder']
   },
   name:{
@@ -30,15 +30,16 @@ const FileSchema = new Schema({
   },
   createdBy: {
     type: String,
-    
+    immutable:true
   },
   createdAt:{
     type:Date,
-    default:new Date()
+    default:()=>Date.now(),
+    immutable:true
   },
   modifiedAt:{
     type:Date,
-    default:new Date()
+    default:()=>Date.now()
   }
 });
 
