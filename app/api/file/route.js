@@ -44,7 +44,7 @@ export const POST = async (request, { params }) => {
     }
     const file = new File({
       name: req.name,
-      comment: req.comment,
+      comments: req.comments,
       parentFolderId: parentFolder._id,
       type: req.type,
       base64String: req.base64String ?? null,

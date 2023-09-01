@@ -48,8 +48,8 @@ export default function toolbar(props) {
             porperty: 'text/x-rustsrc',
         },
         {
-            displayName: 't.txt',
-            porperty: 'text/txt',
+            displayName: '.txt',
+            porperty: 'text/plain',
         },
         {
             displayName: '.doc',
@@ -74,7 +74,7 @@ export default function toolbar(props) {
     const [file, setFile] = useState({})
     let fileType = fileTypeOption[0].porperty
 
-    const [uploadButtonRef, fileRef, folderRef, fileCommentRef, folderCommentRef, commentsRef] = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
+    const [uploadButtonRef, fileRef, folderRef, fileCommentRef, folderCommentRef, commentsRef, confirmFileCommentRef] = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
     const createFile = async () => {
         setLoading(true)
         //create file,then redirect user to edit page to contuinue the creation
@@ -108,7 +108,7 @@ export default function toolbar(props) {
                 body: JSON.stringify({
                     name: folderRef.current.value,
                     path: props.path,
-                    comment: folderCommentRef.current.value
+                    comments: folderCommentRef.current.value
                 })
             }).then(res => {
                 setSnackbarSeverity("success")
@@ -138,8 +138,7 @@ export default function toolbar(props) {
                     name: targetFile.name,
                     type: targetFile.type,
                     base64String: base64String,
-
-                    currentPath: props.path
+                    path: props.path,
                 })
 
                 setConfirmDialog(true)
@@ -151,7 +150,7 @@ export default function toolbar(props) {
         await fetch('/api/file',
             {
                 method: "POST",
-                body: JSON.stringify({ file })
+                body: JSON.stringify({ ...file, comments: confirmFileCommentRef.current.value })
             }).then(res => {
                 setSnackbarSeverity("success")
                 setSnackbarMessage("upload success")
@@ -244,8 +243,7 @@ export default function toolbar(props) {
                         :
                         <div>
                             <DialogContent>
-                                <TextField inputRef={fileRef} label="File Name" variant="outlined" />
-                                <TextField inputRef={fileCommentRef} label="Remarks..." variant="outlined" color="secondary" />
+                                <TextField inputRef={fileRef} label="File Name" variant="outlined" sx={{ width: 200 }} />
                                 <Autocomplete
                                     options={fileTypeOption}
                                     getOptionLabel={(option) => option.displayName}
@@ -253,7 +251,9 @@ export default function toolbar(props) {
                                     renderInput={(params) => <TextField {...params} />}
                                     onChange={(e, v) => { fileType = v.porperty }}
                                     defaultValue={fileTypeOption[0]}
+                                    sx={{ width: 200, marginTop: '10px' }}
                                 />
+                                <TextField inputRef={fileCommentRef} label="Remarks..." variant="outlined" color="secondary" sx={{ width: 400, marginTop: '10px' }} />
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setFileDialog(false)}>Back</Button>
@@ -306,10 +306,12 @@ export default function toolbar(props) {
                         <div>
 
                             <DialogContent>
-                                Upload file <span style={{ fontSize: '18px' }}>
-                                    {file?.name}
-                                </span>
-                                ?
+                                <div>
+                                    Upload file <span style={{ fontSize: '18px' }}>
+                                        {file?.name}
+                                    </span>
+                                    ?</div>
+                                <TextField inputRef={confirmFileCommentRef} label="comment for upload file" variant="outlined" sx={{ width: 400 }} />
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={cancelUpload}>Cancel</Button>
