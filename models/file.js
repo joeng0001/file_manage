@@ -1,48 +1,48 @@
-import { Schema, model, models ,SchemaType} from 'mongoose';
+import { Schema, model, models, SchemaType } from "mongoose";
 
 const FileSchema = new Schema({
-  parentFolderId:{
-    type:SchemaType.ObjectId,
-    requried:[true,'each file belongs to a folder']
+  parentFolderId: {
+    type: Schema.Types.ObjectId,
+    ref: "File",
+    requried: [true, "each file belongs to a folder"],
   },
-  name:{
-    type:String,
-    required:[true,'fileName is required'],
+  name: {
+    type: String,
+    required: [true, "fileName is required"],
   },
-  type:{
-    type:String,
-    required:[true,"file MIME type is missing"]
+  type: {
+    type: String,
+    required: [true, "file MIME type is missing"],
   },
-  base64String:{
-    type:String,
-    required:[true,'file content is required']
+  base64String: {
+    type: String,
   },
-  encrypted:{
-    type:Boolean,
-    default:false
+  encrypted: {
+    type: Boolean,
+    default: false,
   },
-  comments:{
-    type:String,
-    default:['']
+  comments: {
+    type: String,
+    default: "",
   },
-  remarks:{
-    type:String,
+  remarks: {
+    type: String,
   },
   createdBy: {
     type: String,
-    immutable:true
+    immutable: true,
   },
-  createdAt:{
-    type:Date,
-    default:()=>Date.now(),
-    immutable:true
+  createdAt: {
+    type: Date,
+    default: () => Date.now(),
+    immutable: true,
   },
-  modifiedAt:{
-    type:Date,
-    default:()=>Date.now()
-  }
+  modifiedAt: {
+    type: Date,
+    default: () => Date.now(),
+  },
 });
 
-const File = models.File || model('File', FileSchema);
+const File = models.File || model("File", FileSchema);
 
 export default File;

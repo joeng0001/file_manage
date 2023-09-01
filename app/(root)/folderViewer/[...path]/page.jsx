@@ -1,16 +1,14 @@
-import { Grid, Box} from "@mui/material"
+import { Grid, Box } from "@mui/material"
 import Link from "next/link"
 import Toolbar from "@/components/Toolbar"
-import {FcOpenedFolder,FcFile} from "react-icons/fc"
+import { FcOpenedFolder, FcFile } from "react-icons/fc"
 
 export default function fileList({ params, searchParams }) {
-
-    const types = params?.type
+    const paths = params?.path
     const page = searchParams?.page
-    const level = types.length
     //console.log(params,searchParams)
     //console.log(item)
-    
+
     const folderList = []
     const fileList = []
 
@@ -22,7 +20,7 @@ export default function fileList({ params, searchParams }) {
                     <Grid item xs={4}>
                         <Link href="/folderViewer/csharp/?page=1" className="disableLinkStyle">
                             <Box className="Box">
-                                <FcOpenedFolder/>
+                                <FcOpenedFolder size={40} />
                                 <div>C#</div>
                             </Box>
                         </Link>
@@ -30,13 +28,13 @@ export default function fileList({ params, searchParams }) {
                     <Grid item xs={4}>
                         <Link href="/folderViewer/csharp/?page=1" className="disableLinkStyle">
                             <Box className="Box">
-                                <FcFile/>
+                                <FcFile size={40} />
                                 <div>C#</div>
                             </Box>
                         </Link>
                     </Grid>
                 </Grid>
-                <Toolbar path={types.join("/")}/>
+                <Toolbar path={paths.join("/")} />
             </div>
 
         </div>

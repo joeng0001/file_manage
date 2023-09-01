@@ -1,22 +1,27 @@
 "use client"
 
-import { SignOutButton, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
-import {useRouter} from 'next/navigation'
-import {useState} from 'react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
-import {AppBar,Toolbar,IconButton,Typography,Autocomplete, TextField,Box,Drawer} from "@mui/material"
-import {Divider,List,ListItem,ListItemButton,ListItemText,ListItemIcon} from "@mui/material"
+import { AppBar, Toolbar, IconButton, Typography, Autocomplete, TextField, Box, Drawer, Divider, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
-import  SearchIcon  from "@mui/icons-material/Search";
+import SearchIcon from "@mui/icons-material/Search";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import InboxIcon from "@mui/icons-material/Inbox"
 import { styled, useTheme } from '@mui/material/styles';
 import Link from "next/link";
-export default function header(){
-    const router=useRouter()
-    const [drawer,setDrawer]=useState(false)
-    const options=[1,2,3,4]
+import dynamic from "next/dynamic";
+const UserButton = dynamic(() => import('@clerk/nextjs').then((module) => module.UserButton), {
+    ssr: false,
+})
+const SignOutButton = dynamic(() => import('@clerk/nextjs').then((module) => module.SignOutButton), {
+    ssr: false,
+})
+export default function header() {
+    const router = useRouter()
+    const [drawer, setDrawer] = useState(false)
+    const options = [1, 2, 3, 4]
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
         alignItems: 'center',
@@ -24,41 +29,44 @@ export default function header(){
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
         justifyContent: 'flex-end',
-      }));
-    return(
+    }));
+    return (
         <div>
-    
-            <Box sx={{ display:'flex',flexGrow: 1 }}>
-                
+
+            <Box sx={{ display: 'flex', flexGrow: 1 }}>
+
                 <AppBar position="fixed">
                     <Toolbar>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        sx={{ mr: 2 }}
-                        onClick={()=>setDrawer(true)}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ display: { xs: 'none', sm: 'block' } }}
-                    >
-                        File Manage
-                    </Typography>
-                    <Autocomplete
-                        options={options}
-                        getOptionLabel={(option) => option.type + '-->' + option.name}
-                        size="small"
-                        renderInput={(params) => <TextField {...params}  />}
-                    />
-                    <Box sx={{ flexGrow: 1 }} /> 
-                    <UserButton afterSignOutUrl="/"/>
-                        
+                        <IconButton
+                            size="large"
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            sx={{ mr: 2 }}
+                            onClick={() => setDrawer(true)}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            variant="h6"
+                            noWrap
+                            component="div"
+                            sx={{ display: { xs: 'none', sm: 'block' } }}
+                        >
+                            File Manage
+                        </Typography>
+                        <SearchIcon style={{ marginLeft: '5px' }} />
+
+                        <Autocomplete
+                            options={options}
+                            getOptionLabel={(option) => option.type + '-->' + option.name}
+                            size="small"
+                            renderInput={(params) => <TextField {...params} placeholder="Search" />}
+                            className="Search_TextField"
+                        />
+                        <Box sx={{ flexGrow: 1 }} />
+
+                        <UserButton afterSignOutUrl="/" />
                     </Toolbar>
                 </AppBar>
             </Box>
@@ -69,31 +77,31 @@ export default function header(){
                     width: 240,
                     flexShrink: 0,
                     '& .MuiDrawer-paper': {
-                    width: 240,
-                    boxSizing: 'border-box',
+                        width: 240,
+                        boxSizing: 'border-box',
                     },
                 }}
-                onClose={()=>setDrawer(false)}
+                onClose={() => setDrawer(false)}
             >
-                 <DrawerHeader>
-                    <IconButton onClick={()=>setDrawer(false)}>
-                         <ChevronLeftIcon />
+                <DrawerHeader>
+                    <IconButton onClick={() => setDrawer(false)}>
+                        <ChevronLeftIcon />
                     </IconButton>
                 </DrawerHeader>
                 <Divider />
                 <List>
-                    <ListItem  disablePadding>
+                    <ListItem disablePadding>
                         <ListItemButton>
                             <ListItemIcon>
-                            <InboxIcon />
+                                <InboxIcon />
                             </ListItemIcon>
                             <ListItemText primary={"hi"} />
                         </ListItemButton>
                     </ListItem>
-                    <ListItem  disablePadding>
+                    <ListItem disablePadding>
                         <ListItemButton>
                             <ListItemIcon>
-                            <InboxIcon />
+                                <InboxIcon />
                             </ListItemIcon>
                             <ListItemText primary={"hi"} />
                         </ListItemButton>
@@ -101,61 +109,61 @@ export default function header(){
                 </List>
                 <Divider />
                 <List>
-                    <ListItem  disablePadding>
+                    <ListItem disablePadding>
                         <ListItemButton>
                             <ListItemIcon>
-                            <InboxIcon />
+                                <InboxIcon />
                             </ListItemIcon>
                             <ListItemText primary={"bye"} />
                         </ListItemButton>
                     </ListItem>
-                    <ListItem  disablePadding>
+                    <ListItem disablePadding>
                         <ListItemButton>
                             <ListItemIcon>
-                            <InboxIcon />
+                                <InboxIcon />
                             </ListItemIcon>
                             <ListItemText primary={"bye"} />
                         </ListItemButton>
                     </ListItem>
                 </List>
-                <Box sx={{ flexGrow: 1,flexDirection:'column' }} />
+                <Box sx={{ flexGrow: 1, flexDirection: 'column' }} />
                 <List>
-                    <ListItem  disablePadding>
-                        
+                    <ListItem disablePadding>
+
                         <ListItemButton>
-                            <Link href="/about" style={{textDecoration:'none',outline:'none',display:'flex'}}>
-                            <ListItemIcon onClick={()=>router.push('/about')}>
-                            <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"about"} />
+                            <Link href="/about" style={{ textDecoration: 'none', outline: 'none', display: 'flex' }}>
+                                <ListItemIcon onClick={() => router.push('/about')}>
+                                    <InboxIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"about"} />
                             </Link>
                         </ListItemButton>
-                       
+
                     </ListItem>
-                </List>    
+                </List>
                 <List>
-                    <ListItem  disablePadding>
-                    <SignOutButton
-                        signOutCallback={()=>router.push('/sign-in')}
-                    >
-                        <ListItemButton>
-                            <ListItemIcon>
-                            <Image
-                                src="/assets/door.svg"
-                                alt="logout"
-                                width={24}
-                                height={24}
-                            />
-                            </ListItemIcon>
-                            <ListItemText primary={"sign out"} />
-                        </ListItemButton>
+                    <ListItem disablePadding>
+                        <SignOutButton
+                            signOutCallback={() => router.push('/sign-in')}
+                        >
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <Image
+                                        src="/assets/door.svg"
+                                        alt="logout"
+                                        width={24}
+                                        height={24}
+                                    />
+                                </ListItemIcon>
+                                <ListItemText primary={"sign out"} />
+                            </ListItemButton>
                         </SignOutButton>
                     </ListItem>
-                </List>   
+                </List>
 
-                        
+
             </Drawer>
-            <DrawerHeader/>
+            <DrawerHeader />
         </div>
     )
 }

@@ -1,27 +1,27 @@
 import { ClerkProvider } from "@clerk/nextjs"
-import {Inter} from "next/font/google"
+import { Inter } from "next/font/google"
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
 import '../globals.css'
 
-export const metadata ={
-    title:'file manage',
-    description:'an next js app'
+export const metadata = {
+    title: 'file manage',
+    description: 'an next js app'
 }
 
-const inter=Inter({subsets:["latin"]})
+const inter = Inter({ subsets: ["latin"] })
 
-export default function RootLayout({ children }){
+export default function RootLayout({ children }) {
     return (
-       <ClerkProvider >
+        <ClerkProvider >
             <html lang="en">
                 <body suppressHydrationWarning={true} className={`${inter.className} fullWidth`}>
-                    <Header/>
+                    <Header />
                     {children}
-                    <Footer/>
+                    <Footer />
                 </body>
             </html>
-      </ClerkProvider>
+        </ClerkProvider>
     )
 }
