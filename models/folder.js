@@ -35,6 +35,10 @@ const FolderSchema = new Schema({
   remarks: {
     type: String,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   createdBy: {
     type: String,
     ref: "User",

@@ -8,56 +8,69 @@ export default function toolbar(props) {
 
     const fileTypeOption = [
         {
-            displayName: '.cs',
-            porperty: 'text/x-csharp'
+            displayName: 'C#',
+            extension: '.cs',
+
         },
         {
-            displayName: '.java',
-            porperty: 'text/java'
+            displayName: 'Java',
+            extension: '.java',
+
         },
         {
-            displayName: '.py',
-            porperty: 'text/python'
+            displayName: 'Python',
+            extension: '.py',
+
         },
         {
-            displayName: '.html',
-            porperty: 'text/html'
+            displayName: 'HTML',
+            extension: '.html',
+
         },
         {
-            displayName: '.css',
-            porperty: 'text/css'
+            displayName: 'CSS',
+            extension: '.css',
+
         },
         {
-            displayName: '.js',
-            porperty: 'text/javascript',
+            displayName: 'Javascript',
+            extension: '.js',
+
         },
         {
-            displayName: '.php',
-            porperty: 'application/x-httpd-php',
+            displayName: 'PHP',
+            extension: '.php',
+
         },
         {
-            displayName: '.rb',
-            porperty: 'application/x-ruby',
+            displayName: 'Ruby',
+            extension: '.rb',
+
         },
         {
-            displayName: '.swift',
-            porperty: 'text/swift',
+            displayName: 'Swift',
+            extension: '.swift',
+
         },
         {
-            displayName: '.rs',
-            porperty: 'text/x-rustsrc',
+            displayName: 'Rust',
+            extension: '.rs',
+
         },
         {
-            displayName: '.txt',
-            porperty: 'text/plain',
+            displayName: 'TXT',
+            extension: '.txt',
+
         },
         {
-            displayName: '.doc',
-            porperty: 'application/msword',
+            displayName: 'Doc',
+            extension: '.doc',
+
         },
         {
-            displayName: '.docx',
-            porperty: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            displayName: 'Docx',
+            extension: '.docx',
+
         },
     ]
 
@@ -136,7 +149,7 @@ export default function toolbar(props) {
 
                 setFile({
                     name: targetFile.name,
-                    type: targetFile.type,
+                    type: targetFile.name.split('.').slice(-1),//extension
                     base64String: base64String,
                     path: props.path,
                 })
@@ -195,13 +208,12 @@ export default function toolbar(props) {
 
     const apitest = async () => {
         //console.log(props.path)
-        await fetch('/api/folder',
+        await fetch('/api/file',
             {
-                method: "POST",
+                method: "DELETE",
                 body: JSON.stringify({
-                    name: 'test',
-                    path: props.path,
-                    comment: 'test'
+                    name: 'FYP.txt',
+                    path: 'java',
                 })
             }).then(res => {
                 setSnackbarSeverity("success")
@@ -218,7 +230,7 @@ export default function toolbar(props) {
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setFolderDialog(true)}><PiFolderPlusBold />Create Folder</Button>
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => { uploadButtonRef.current.click() }}>
                     <MdFileUpload />Upload File
-                    <input ref={uploadButtonRef} type='file' accept=".jpg, .pdf, .png, .doc, .docx, .txt, .html, .css, .js, .py"
+                    <input ref={uploadButtonRef} type='file' accept=".jpg, .pdf, .png, .cs,.java,.py,.html,.css,.js,.php,.rb,.swift,.rs,.txt,.doc,.docx"
                         onChange={(e) => fileSelect(e)} className="HidedButton" />
 
                 </Button>
@@ -246,7 +258,7 @@ export default function toolbar(props) {
                                 <TextField inputRef={fileRef} label="File Name" variant="outlined" sx={{ width: 200 }} />
                                 <Autocomplete
                                     options={fileTypeOption}
-                                    getOptionLabel={(option) => option.displayName}
+                                    getOptionLabel={(option) => option.extension}
                                     size="small"
                                     renderInput={(params) => <TextField {...params} />}
                                     onChange={(e, v) => { fileType = v.porperty }}

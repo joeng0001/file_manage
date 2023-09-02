@@ -2,6 +2,26 @@ import File from "@/models/file";
 import Folder from "@/models/folder";
 import { connectToDB, createRootFolderIfNotExist } from "@/lib/database";
 
+const fileAllowType = [
+  ".cs",
+  ".java",
+  ".py",
+  ".html",
+  ".css",
+  ".js",
+  ".php",
+  ".rb",
+  ".swift",
+  ".rs",
+  ".txt",
+  ".doc",
+  ".docx",
+  ".png",
+  ".pdf",
+  ".jpg",
+  ".zip",
+];
+
 export const GET = async (request, { params }) => {
   const req = await request.json();
   try {
@@ -30,6 +50,11 @@ const getChildId = async (pathList, level, stopLevel) => {
 export const POST = async (request, { params }) => {
   try {
     const req = await request.json();
+    if (!req.type in fileAllowType) {
+      console.log("file type not allow");
+      throw new Error("file type not allowed");
+    }
+
     await connectToDB();
     const pathList = req.path?.split("/");
     await createRootFolderIfNotExist(pathList[0]);
@@ -70,3 +95,24 @@ export const POST = async (request, { params }) => {
 };
 
 export const PUT = async (request) => {};
+
+export const DELETE = async (request) => {
+  const req = await request.json();
+  await connectToDB();
+  console.log("receive req", req);
+  const pathList = req.path?.split("/");
+  const parentFolder = await getChildId(pathList, 1, pathList.length);
+  console.log("find parent folder", parentFolder);
+  const fileList = parentFolder.fileList;
+  const fileId = fileList.find((item) => item.name === req.name);
+  console.log("fileId", fileId);
+  const file = await File.findByIdAndUpdate(
+    fileId,
+    {
+      isDeleted: true,
+    },
+    { new: true }
+  );
+  console.log("after result", file);
+  return new Response(JSON.stringify({ data: "success" }), { status: 200 });
+};
