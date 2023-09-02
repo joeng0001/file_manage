@@ -1,47 +1,33 @@
 import Folder from "@/models/folder";
-import { connectToDB, createRootFolderIfNotExist } from "@/lib/database";
+import {
+  connectToDB,
+  createRootFolderIfNotExist,
+  getChildId,
+} from "@/lib/database";
 
 export const GET = async (request, { params }) => {
+  const url = new URL(request.url);
+  const searchParams = new URLSearchParams(url.search);
+  const path = searchParams.get("path");
+  const name = searchParams.get("name");
   try {
-    const req = await request.json();
     await connectToDB();
-    const options = {
-      upsert: true, // Creates a new document if no match is found
-      new: true, // Returns the modified document
-      setDefaultsOnInsert: true, // Sets default values if a new document is created
-    };
+    const pathList = path?.split("/");
+    console.log(pathList);
+    console.log("receive path");
+    const parentFolder = await getChildId(pathList, 1, pathList.length);
+    const folderId = parentFolder.folderList.find(
+      (item) => item.name === name
+    )?._id;
+    console.log(folderId);
+    const folder = await Folder.findById(folderId);
+    console.log("send back folder", folder);
 
-    try {
-      const result = await Folder.findOneAndUpdate(
-        {},
-        {
-          name: "",
-          rootFolderId: "",
-          level: 1,
-        },
-        options
-      );
-      console.log(result);
-    } catch (error) {
-      console.error(error);
-    }
-    return new Response(JSON.stringify({ data: "success" }), { status: 200 });
+    return new Response(JSON.stringify("nice"), { status: 200 });
   } catch (error) {
     return new Response("Failed to fetch prompts created by user", {
       status: 500,
     });
-  }
-};
-
-const getChildId = async (pathList, level, stopLevel) => {
-  const folder = await Folder.findOne({
-    name: pathList[level - 1],
-    level: level,
-  });
-  if (level === stopLevel) {
-    return folder;
-  } else {
-    return await getChildId(pathList, level + 1, stopLevel);
   }
 };
 

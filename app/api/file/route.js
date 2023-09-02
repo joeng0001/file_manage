@@ -1,20 +1,10 @@
 import File from "@/models/file";
 import Folder from "@/models/folder";
-import { connectToDB, createRootFolderIfNotExist } from "@/lib/database";
-
-const getChildId = async (pathList, level, stopLevel) => {
-  console.log("calling");
-  const folder = await Folder.findOne({
-    name: pathList[level - 1],
-    level: level,
-  });
-
-  if (level === stopLevel) {
-    return folder;
-  } else {
-    return await getChildId(pathList, level + 1, stopLevel);
-  }
-};
+import {
+  connectToDB,
+  createRootFolderIfNotExist,
+  getChildId,
+} from "@/lib/database";
 
 const fileAllowType = [
   ".cs",
