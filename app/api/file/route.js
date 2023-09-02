@@ -2,6 +2,20 @@ import File from "@/models/file";
 import Folder from "@/models/folder";
 import { connectToDB, createRootFolderIfNotExist } from "@/lib/database";
 
+const getChildId = async (pathList, level, stopLevel) => {
+  console.log("calling");
+  const folder = await Folder.findOne({
+    name: pathList[level - 1],
+    level: level,
+  });
+
+  if (level === stopLevel) {
+    return folder;
+  } else {
+    return await getChildId(pathList, level + 1, stopLevel);
+  }
+};
+
 const fileAllowType = [
   ".cs",
   ".java",
@@ -23,11 +37,24 @@ const fileAllowType = [
 ];
 
 export const GET = async (request, { params }) => {
-  const req = await request.json();
+  const url = new URL(request.url);
+  const searchParams = new URLSearchParams(url.search);
+  const path = searchParams.get("path");
+  const name = searchParams.get("name");
   try {
     await connectToDB();
-    const file = await File.find({ _id: req._id });
-    return new Response(JSON.stringify(file), { status: 200 });
+    const pathList = path?.split("/");
+    console.log(pathList);
+    console.log("receive path");
+    const parentFolder = await getChildId(pathList, 1, pathList.length);
+    const fileId = parentFolder.fileList.find(
+      (item) => item.name === name
+    )?._id;
+    console.log(fileId);
+    const file = await File.findById(fileId);
+    console.log("send back file", file);
+    //dont send complete file,only part of fields
+    return new Response(JSON.stringify("nice"), { status: 200 });
   } catch (error) {
     return new Response("Failed to fetch prompts created by user", {
       status: 500,
@@ -35,21 +62,8 @@ export const GET = async (request, { params }) => {
   }
 };
 
-const getChildId = async (pathList, level, stopLevel) => {
-  const folder = await Folder.findOne({
-    name: pathList[level - 1],
-    level: level,
-  });
-  if (level === stopLevel) {
-    return folder;
-  } else {
-    return await getChildId(pathList, level + 1, stopLevel);
-  }
-};
-
 export const POST = async (request, { params }) => {
   try {
-    const req = await request.json();
     if (!req.type in fileAllowType) {
       console.log("file type not allow");
       throw new Error("file type not allowed");
