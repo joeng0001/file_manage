@@ -15,7 +15,7 @@ export default function fileList({ params, searchParams }) {
     // prompt dialog ,get name  and create file ,then redirect to that page
     return (
         <div className="homeBackGround">
-            <div style={{ display: 'flex' }}>
+            <div className="GridContainer">
                 <Grid container>
                     <Grid item xs={4}>
                         <Link href="/folderViewer/csharp/?page=1" className="disableLinkStyle">

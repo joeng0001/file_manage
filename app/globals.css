@@ -111,9 +111,7 @@ body {
   position: absolute;
   height: 100%;
   width: 100%;
-  /* background-image: url('/assets/aboutBackGround.png'); */
-  background: linear-gradient(to right, #1a1a1a, #000);
-
+  background: linear-gradient(to right, #6e6e6e, #000000); 
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -143,7 +141,7 @@ body {
   perspective: 150rem;
   margin: 2em auto;
   height: 40rem;
-  max-width: 400px;
+  width: 400px;
   box-shadow: none;
   background: none;
 }
@@ -161,7 +159,7 @@ body {
 }
 
 .homeBackGround{
-  position: sticky;
+  position: absolute;
   top:70px;
   width: 100%;
   background: linear-gradient(to right, #575656, #0b102e);
@@ -174,8 +172,14 @@ body {
   font-family: Arial, sans-serif;
   padding-top:20px;
   padding-bottom:20px;
-  height:calc(100vh - 110px);
   
+  
+}
+
+.GridContainer{
+  overflow-y:scroll;
+  height: calc(100vh - 110px);
+  display:flex;
 }
 
 .fileViewerBackGround{
@@ -227,7 +231,6 @@ body {
 .toolbar{
   display:flex;
   flex-direction:column;
-  justify-content:center;
   color:#b0fff2;
   min-width:15vw;
   height:100%;
