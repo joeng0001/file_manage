@@ -197,7 +197,7 @@ export default function toolbar(props) {
         await fetch('/api/folder',
             {
                 method: "PUT",
-                body: JSON.stringify({ comment: commentsRef.current.value })
+                body: JSON.stringify({ comment: commentsRef.current.value, path: props.path })
             }).then(res => {
                 setSnackbarSeverity("success")
                 setSnackbarMessage("upload success")

@@ -69,6 +69,28 @@ export const POST = async (request, { params }) => {
   }
 };
 
+export const PUT = async (request) => {
+  try {
+    const req = await request.json();
+    await connectToDB();
+    const pathList = req.path?.split("/");
+    const folder = await getChildId(pathList, 1, pathList.length);
+
+    console.log("get folder", folder);
+    const new_folder = await Folder.findByIdAndUpdate(
+      folder._id,
+      { comment: req.comment },
+      { new: true }
+    );
+    console.log("update folder", new_folder);
+    return new Response(JSON.stringify({ data: "success" }), { status: 200 });
+  } catch (error) {
+    return new Response("Failed to fetch prompts created by user", {
+      status: 500,
+    });
+  }
+};
+
 export const Delete = async (request) => {
   try {
   } catch (error) {
