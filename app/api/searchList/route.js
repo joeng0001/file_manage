@@ -6,22 +6,22 @@ export const GET = async (request, { params }) => {
   try {
     await connectToDB();
     const folders = await Folder.find();
-    console.log("get folders", folders);
+    //console.log("get folders", folders);
     const files = await File.find();
-    console.log("get files", files);
+    //console.log("get files", files);
     const res = {
       folders: folders.map((folder) => {
         return {
           id: folder._id,
           name: folder.name,
-          path: folder.path,
+          path: "/" + folder.path,
         };
       }),
       files: files.map((file) => {
         return {
           id: file._id,
           name: file.name,
-          path: file.path,
+          path: "/" + file.path,
         };
       }),
     };

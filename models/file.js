@@ -14,6 +14,11 @@ const FileSchema = new Schema({
     type: String,
     required: [true, "file MIME type is missing"],
   },
+  path: {
+    type: String,
+    require: [true, "path is required"],
+    immutable: true,
+  },
   base64String: {
     type: String,
   },

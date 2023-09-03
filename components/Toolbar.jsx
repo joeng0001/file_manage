@@ -1,5 +1,5 @@
 "use client"
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert, Autocomplete } from "@mui/material"
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert, Autocomplete, Tooltip } from "@mui/material"
 import { useState, useRef } from "react"
 import { PiFolderPlusBold, PiFilePlusBold } from 'react-icons/pi'
 import { MdComment, MdFileUpload } from 'react-icons/md'
@@ -85,11 +85,17 @@ export default function toolbar(props) {
 
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState({})
-    let fileType = fileTypeOption[0].porperty
+    let fileType = fileTypeOption[0].extension
 
     const [uploadButtonRef, fileRef, folderRef, fileCommentRef, folderCommentRef, commentsRef, confirmFileCommentRef] = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
     const createFile = async () => {
         setLoading(true)
+        console.log({
+            name: fileRef.current.value,
+            type: fileType,
+            path: props.path,
+            comment: fileCommentRef.current.value
+        })
         //create file,then redirect user to edit page to contuinue the creation
         await fetch('/api/file',
             {
@@ -215,6 +221,21 @@ export default function toolbar(props) {
                 setSnackbarOpen(true)
             })
     }
+
+    const renderOption = (props, option, state) => {
+        console.log(props, option)
+        return (
+
+            <li {...props} key={option.extension} >
+                <Tooltip title={option.extension} placement="right">
+                    <div>{option.displayName}</div>
+                </Tooltip>
+            </li>
+
+
+        );
+    };
+
     return (
 
         <div>
@@ -252,10 +273,11 @@ export default function toolbar(props) {
                                 <TextField inputRef={fileRef} label="File Name" variant="outlined" sx={{ width: 200 }} />
                                 <Autocomplete
                                     options={fileTypeOption}
-                                    getOptionLabel={(option) => option.extension}
+                                    getOptionLabel={(option) => option.displayName}
                                     size="small"
-                                    renderInput={(params) => <TextField {...params} />}
-                                    onChange={(e, v) => { fileType = v.porperty }}
+                                    renderInput={params => <TextField {...params} />}
+                                    renderOption={renderOption}
+                                    onChange={(e, v) => { fileType = v?.extension ?? null }}
                                     defaultValue={fileTypeOption[0]}
                                     sx={{ width: 200, marginTop: '10px' }}
                                 />

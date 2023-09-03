@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { dark } from '@clerk/themes'
 import { Grid, Box } from '@mui/material'
 import { TiDocumentAdd } from "react-icons/ti"
-import { GrDocumentZip } from "react-icons/gr"
+import { PiFileZipLight } from "react-icons/pi"
 import { SiCsharp, SiJavascript, SiPhp } from "react-icons/si";
 import { DiJava, DiPython, DiHtml5, DiCss3, DiRuby, DiSwift, DiRust } from "react-icons/di"
 import { BsFiletypeTxt, BsCardImage, BsFiletypePdf, BsFiletypeDoc } from "react-icons/bs"
@@ -93,7 +93,7 @@ export default function Home() {
     },
     {
       href: '/folderViewer/zip/?page=1',
-      icon: <GrDocumentZip size={40} />,
+      icon: <PiFileZipLight size={40} />,
       title: 'Zip'
     }
 

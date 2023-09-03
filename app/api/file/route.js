@@ -53,8 +53,11 @@ export const GET = async (request, { params }) => {
 };
 
 export const POST = async (request, { params }) => {
+  const req = await request.json();
+  console.log(req);
+  console.log(fileAllowType.includes(req.type));
   try {
-    if (!req.type in fileAllowType) {
+    if (!fileAllowType.includes(req.type)) {
       console.log("file type not allow");
       throw new Error("file type not allowed");
     }
@@ -62,6 +65,7 @@ export const POST = async (request, { params }) => {
     await connectToDB();
     const pathList = req.path?.split("/");
     await createRootFolderIfNotExist(pathList[0]);
+    console.log("after createrootfolder");
     const parentFolder = await getChildId(pathList, 1, pathList.length);
     if (
       parentFolder.fileList.find(
@@ -71,6 +75,7 @@ export const POST = async (request, { params }) => {
       console.log("detect duplicated file");
       throw new Error("file already exist");
     }
+    console.log("create file");
     const file = new File({
       name: req.name,
       comments: req.comments,

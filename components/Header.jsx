@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
-import { AppBar, Toolbar, IconButton, Typography, Autocomplete, TextField, Box, Drawer, Divider, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from "@mui/material"
+import { AppBar, Toolbar, IconButton, Typography, Autocomplete, TextField, Box, Drawer, Divider, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Tooltip } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
 import SearchIcon from "@mui/icons-material/Search";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
@@ -25,13 +25,18 @@ export default function header() {
     // Create a custom styled component for the dropdown list
 
     const renderOption = (props, option, state) => {
-        console.log("check option", option, props)
         const backgroundColor = option.label === 'file' ? 'lightgray' : 'darkgray'; // Customize background color based on option type
 
         return (
+
+
             <li {...props} key={option.id} style={{ backgroundColor }}>
-                {option.name}
+                <Tooltip title={option.path ?? 'path not provided'} placement="right">
+                    <div>[{option.label}] &nbsp;{option.name}</div>
+                </Tooltip>
             </li>
+
+
         );
     };
 
@@ -54,33 +59,22 @@ export default function header() {
         console.log("init option list")
         const res = await fetch(`/api/searchList`,)
         const real_res = await res.json()
-        console.log([
-            ...real_res.files.map((file) => {
-                return {
-                    label: 'file',
-                    name: file.name,
-                }
-            }),
-            ...real_res.folders.map((folder) => {
-                return {
-                    label: 'folder',
-                    name: folder.name,
-                }
-            })
-        ])
+
         setOptions([
             ...real_res.files.map((file) => {
                 return {
                     label: 'file',
                     name: file.name,
-                    id: file.id
+                    id: file.id,
+                    path: file.path
                 }
             }),
             ...real_res.folders.map((folder) => {
                 return {
                     label: 'folder',
                     name: folder.name,
-                    id: folder.id
+                    id: folder.id,
+                    path: folder.path
                 }
             })
         ])
@@ -118,13 +112,13 @@ export default function header() {
                         <SearchIcon style={{ marginLeft: '5px' }} />
 
                         <Autocomplete
-
                             getOptionLabel={(option) => option.name}
                             renderOption={renderOption}
                             options={options}
                             size="small"
                             renderInput={params => <TextField  {...params} placeholder="Search" />}
                             className="Search_TextField"
+                            onOpen={initOptionsList}
                         />
                         <Box sx={{ flexGrow: 1 }} />
 
