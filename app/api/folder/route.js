@@ -2,30 +2,35 @@ import Folder from "@/models/folder";
 import {
   connectToDB,
   createRootFolderIfNotExist,
-  getChildId,
+  getFolder,
 } from "@/lib/database";
+import { auth } from "@clerk/nextjs";
 
 export const GET = async (request, { params }) => {
+  console.log("receive get request of folder", request.url);
+  const a = auth();
+  console.log(a);
+  // if (!userId) throw new Error("not authorized");
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.search);
   const path = searchParams.get("path");
-  const name = searchParams.get("name");
   try {
     await connectToDB();
     const pathList = path?.split("/");
     console.log(pathList);
     console.log("receive path");
-    const parentFolder = await getChildId(pathList, 1, pathList.length);
-    const folderId = parentFolder.folderList.find(
-      (item) => item.name === name
-    )?._id;
-    console.log(folderId);
-    const folder = await Folder.findById(folderId);
+    const folder = await getFolder(pathList, 1, pathList.length);
     console.log("send back folder", folder);
 
-    return new Response(JSON.stringify("nice"), { status: 200 });
+    return new Response(
+      JSON.stringify({
+        fileList: folder.fileList,
+        folderList: folder.folderList,
+      }),
+      { status: 200 }
+    );
   } catch (error) {
-    return new Response("Failed to fetch prompts created by user", {
+    return new Response("Failed to fetch ", {
       status: 500,
     });
   }
@@ -37,7 +42,7 @@ export const POST = async (request, { params }) => {
     await connectToDB();
     const pathList = req.path?.split("/");
     await createRootFolderIfNotExist(pathList[0]);
-    const parentFolder = await getChildId(pathList, 1, pathList.length);
+    const parentFolder = await getFolder(pathList, 1, pathList.length);
     console.log("get parent folder", parentFolder);
     if (parentFolder.folderList.find((folder) => folder.name === req.name)) {
       console.log("folder existed");
@@ -74,7 +79,7 @@ export const PUT = async (request) => {
     const req = await request.json();
     await connectToDB();
     const pathList = req.path?.split("/");
-    const folder = await getChildId(pathList, 1, pathList.length);
+    const folder = await getFolder(pathList, 1, pathList.length);
 
     console.log("get folder", folder);
     const new_folder = await Folder.findByIdAndUpdate(

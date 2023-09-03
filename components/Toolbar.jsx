@@ -214,8 +214,10 @@ export default function toolbar(props) {
 
     const apitest = async () => {
         //console.log(props.path)
-        await fetch(`/api/searchList`,)
-            .then(res => {
+        await fetch(`/api/folder?path=java`,)
+            .then(async (res) => {
+                const a = await res.json()
+                console.log(a)
                 setSnackbarSeverity("success")
                 setSnackbarMessage("upload success")
                 setSnackbarOpen(true)

@@ -32,7 +32,12 @@ export default function header() {
 
             <li {...props} key={option.id} style={{ backgroundColor }}>
                 <Tooltip title={option.path ?? 'path not provided'} placement="right">
-                    <div>[{option.label}] &nbsp;{option.name}</div>
+                    <div>
+                        <span style={{ fontWeight: 600 }}>
+                            [{option.label}]
+                        </span>
+
+                        &nbsp;{option.name}</div>
                 </Tooltip>
             </li>
 

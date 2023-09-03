@@ -3,7 +3,7 @@ import Folder from "@/models/folder";
 import {
   connectToDB,
   createRootFolderIfNotExist,
-  getChildId,
+  getFolder,
 } from "@/lib/database";
 
 const fileAllowType = [
@@ -36,7 +36,7 @@ export const GET = async (request, { params }) => {
     const pathList = path?.split("/");
     console.log(pathList);
     console.log("receive path");
-    const parentFolder = await getChildId(pathList, 1, pathList.length);
+    const parentFolder = await getFolder(pathList, 1, pathList.length);
     const fileId = parentFolder.fileList.find(
       (item) => item.name === name
     )?._id;
@@ -66,7 +66,7 @@ export const POST = async (request, { params }) => {
     const pathList = req.path?.split("/");
     await createRootFolderIfNotExist(pathList[0]);
     console.log("after createrootfolder");
-    const parentFolder = await getChildId(pathList, 1, pathList.length);
+    const parentFolder = await getFolder(pathList, 1, pathList.length);
     if (
       parentFolder.fileList.find(
         (file) => file.name === req.name && file.type === req.type
@@ -111,7 +111,7 @@ export const DELETE = async (request) => {
   await connectToDB();
   console.log("receive req", req);
   const pathList = req.path?.split("/");
-  const parentFolder = await getChildId(pathList, 1, pathList.length);
+  const parentFolder = await getFolder(pathList, 1, pathList.length);
   console.log("find parent folder", parentFolder);
   const fileList = parentFolder.fileList;
   const fileId = fileList.find((item) => item.name === req.name);
