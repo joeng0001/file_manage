@@ -21,6 +21,11 @@ const FolderSchema = new Schema({
     require: [true, "each folder has a level identifier"],
     min: 1,
   },
+  path: {
+    type: String,
+    require: [true, "path is required"],
+    immutable: true,
+  },
   folderList: {
     type: Array,
     default: [],

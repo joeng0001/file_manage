@@ -10,8 +10,20 @@ export const GET = async (request, { params }) => {
     const files = await File.find();
     console.log("get files", files);
     const res = {
-      folders: folders.map((folder) => folder.name),
-      files: files.map((file) => file.name),
+      folders: folders.map((folder) => {
+        return {
+          id: folder._id,
+          name: folder.name,
+          path: folder.path,
+        };
+      }),
+      files: files.map((file) => {
+        return {
+          id: file._id,
+          name: file.name,
+          path: file.path,
+        };
+      }),
     };
     console.log("send res", res);
     return new Response(JSON.stringify(res), { status: 200 });

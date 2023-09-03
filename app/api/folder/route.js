@@ -48,6 +48,7 @@ export const POST = async (request, { params }) => {
       comment: req.comment,
       parentFolderId: parentFolder._id,
       level: pathList.length + 1,
+      path: req.path,
     });
     const new_folder = await folder.save();
 

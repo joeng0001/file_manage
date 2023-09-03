@@ -77,6 +77,7 @@ export const POST = async (request, { params }) => {
       parentFolderId: parentFolder._id,
       type: req.type,
       base64String: req.base64String ?? null,
+      path: req.path,
     });
     const new_file = await file.save();
     console.log("new file", new_file);

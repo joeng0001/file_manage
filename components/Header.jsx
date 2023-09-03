@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import { AppBar, Toolbar, IconButton, Typography, Autocomplete, TextField, Box, Drawer, Divider, List, ListItem, ListItemButton, ListItemText, ListItemIcon } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
@@ -21,7 +21,20 @@ const SignOutButton = dynamic(() => import('@clerk/nextjs').then((module) => mod
 export default function header() {
     const router = useRouter()
     const [drawer, setDrawer] = useState(false)
-    const options = [1, 2, 3, 4]
+    const [options, setOptions] = useState([])
+    // Create a custom styled component for the dropdown list
+
+    const renderOption = (props, option, state) => {
+        console.log("check option", option, props)
+        const backgroundColor = option.label === 'file' ? 'lightgray' : 'darkgray'; // Customize background color based on option type
+
+        return (
+            <li {...props} key={option.id} style={{ backgroundColor }}>
+                {option.name}
+            </li>
+        );
+    };
+
     const DrawerHeader = styled('div')(({ theme }) => ({
         display: 'flex',
         alignItems: 'center',
@@ -30,6 +43,53 @@ export default function header() {
         ...theme.mixins.toolbar,
         justifyContent: 'flex-end',
     }));
+
+    const searching = async (keyword) => {
+        console.log("keyword", keyword)
+        const res = await fetch(`/api/searchList?keyword=${keyword}`,)
+        const real_res = await res.json()
+        console.log(real_res)
+    }
+    const initOptionsList = async () => {
+        console.log("init option list")
+        const res = await fetch(`/api/searchList`,)
+        const real_res = await res.json()
+        console.log([
+            ...real_res.files.map((file) => {
+                return {
+                    label: 'file',
+                    name: file.name,
+                }
+            }),
+            ...real_res.folders.map((folder) => {
+                return {
+                    label: 'folder',
+                    name: folder.name,
+                }
+            })
+        ])
+        setOptions([
+            ...real_res.files.map((file) => {
+                return {
+                    label: 'file',
+                    name: file.name,
+                    id: file.id
+                }
+            }),
+            ...real_res.folders.map((folder) => {
+                return {
+                    label: 'folder',
+                    name: folder.name,
+                    id: folder.id
+                }
+            })
+        ])
+
+    }
+
+    useEffect(() => {
+        initOptionsList()
+    }, [])
     return (
         <div>
 
@@ -58,10 +118,12 @@ export default function header() {
                         <SearchIcon style={{ marginLeft: '5px' }} />
 
                         <Autocomplete
+
+                            getOptionLabel={(option) => option.name}
+                            renderOption={renderOption}
                             options={options}
-                            getOptionLabel={(option) => option.type + '-->' + option.name}
                             size="small"
-                            renderInput={(params) => <TextField {...params} placeholder="Search" />}
+                            renderInput={params => <TextField  {...params} placeholder="Search" />}
                             className="Search_TextField"
                         />
                         <Box sx={{ flexGrow: 1 }} />
