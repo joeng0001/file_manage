@@ -5,33 +5,14 @@ import {
   createRootFolderIfNotExist,
   getFolder,
 } from "@/lib/database";
-
-const fileAllowType = [
-  ".cs",
-  ".java",
-  ".py",
-  ".html",
-  ".css",
-  ".js",
-  ".php",
-  ".rb",
-  ".swift",
-  ".rs",
-  ".txt",
-  ".doc",
-  ".docx",
-  ".png",
-  ".pdf",
-  ".jpg",
-  ".zip",
-];
+import { fileAllowExtension, type2extensionDictionary } from "@/lib/constant";
 
 export const GET = async (request, { params }) => {
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.search);
   const path = searchParams.get("path");
   const name = searchParams.get("name");
-  const type = searchParams.get("type");
+  const extension = type2extensionDictionary[searchParams.get("type")];
   try {
     await connectToDB();
     const pathList = path?.split("/");
@@ -39,7 +20,7 @@ export const GET = async (request, { params }) => {
     console.log("receive path");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
     const fileId = parentFolder.fileList.find(
-      (item) => item.name === name && item.type === type
+      (item) => item.name === name && item.extension === extension
     )?._id;
     console.log(fileId);
     const file = await File.findById(fileId);
@@ -58,9 +39,9 @@ export const GET = async (request, { params }) => {
 export const POST = async (request, { params }) => {
   const req = await request.json();
   console.log(req);
-  console.log(fileAllowType.includes(req.type));
+  console.log(fileAllowExtension.includes(req.extension));
   try {
-    if (!fileAllowType.includes(req.type)) {
+    if (!fileAllowExtension.includes(req.extension)) {
       console.log("file type not allow");
       throw new Error("file type not allowed");
     }
@@ -72,18 +53,25 @@ export const POST = async (request, { params }) => {
     const parentFolder = await getFolder(pathList, 1, pathList.length);
     if (
       parentFolder.fileList.find(
-        (file) => file.name === req.name && file.type === req.type
+        (file) => file.name === req.name && file.extension === req.extension
       )
     ) {
       console.log("detect duplicated file");
       throw new Error("file already exist");
     }
-    console.log("create file");
+    console.log("create file", {
+      name: req.name,
+      comments: req.comments ?? null,
+      parentFolderId: parentFolder._id,
+      extension: req.extension,
+      base64String: req.base64String ?? null,
+      path: req.path,
+    });
     const file = new File({
       name: req.name,
       comments: req.comments,
       parentFolderId: parentFolder._id,
-      type: req.type,
+      extension: req.extension,
       base64String: req.base64String ?? null,
       path: req.path,
     });
@@ -92,7 +80,7 @@ export const POST = async (request, { params }) => {
     parentFolder.fileList.push({
       _id: new_file._id,
       name: new_file.name,
-      type: new_file.type,
+      extension: new_file.extension,
       path: new_file.path,
     });
     const new_parent_folder = await Folder.findByIdAndUpdate(

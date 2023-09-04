@@ -85,14 +85,14 @@ export default function toolbar(props) {
 
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState({})
-    let fileType = fileTypeOption[0].extension
+    let fileExtension = fileTypeOption[0].extension
 
     const [uploadButtonRef, fileRef, folderRef, fileCommentRef, folderCommentRef, commentsRef, confirmFileCommentRef] = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
     const createFile = async () => {
         setLoading(true)
         console.log({
             name: fileRef.current.value,
-            type: fileType,
+            extension: fileExtension,
             path: props.path,
             comment: fileCommentRef.current.value
         })
@@ -102,7 +102,7 @@ export default function toolbar(props) {
                 method: "POST",
                 body: JSON.stringify({
                     name: fileRef.current.value,
-                    type: fileType,
+                    extension: fileExtension,
                     path: props.path,
                     comment: fileCommentRef.current.value
                 })
@@ -155,7 +155,7 @@ export default function toolbar(props) {
 
                 setFile({
                     name: targetFile.name,
-                    type: '.' + targetFile.name.split('.').slice(-1)[0],//extension
+                    extension: '.' + targetFile.name.split('.').slice(-1)[0],//extension
                     base64String: base64String,
                     path: props.path,
                 })
@@ -279,7 +279,7 @@ export default function toolbar(props) {
                                     size="small"
                                     renderInput={params => <TextField {...params} />}
                                     renderOption={renderOption}
-                                    onChange={(e, v) => { fileType = v?.extension ?? null }}
+                                    onChange={(e, v) => { fileExtension = v?.extension ?? null }}
                                     defaultValue={fileTypeOption[0]}
                                     sx={{ width: 200, marginTop: '10px' }}
                                 />

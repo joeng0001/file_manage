@@ -10,9 +10,9 @@ const FileSchema = new Schema({
     type: String,
     required: [true, "fileName is required"],
   },
-  type: {
+  extension: {
     type: String,
-    required: [true, "file MIME type is missing"],
+    required: [true, "file extension is missing"],
   },
   path: {
     type: String,

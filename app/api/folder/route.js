@@ -5,6 +5,7 @@ import {
   getFolder,
 } from "@/lib/database";
 import { auth } from "@clerk/nextjs";
+import { extension2typeDictionary, extension2viewType } from "@/lib/constant";
 
 export const GET = async (request, { params }) => {
   //console.log("receive get request of folder", request.url);
@@ -26,11 +27,12 @@ export const GET = async (request, { params }) => {
       JSON.stringify({
         fileList:
           folder?.fileList?.map((file) => {
+            console.log(extension2typeDictionary[".cs"]);
             return {
               name: file.name,
               path: file.path,
-              viewType: "code",
-              type: file.type,
+              viewType: extension2viewType[file.extension],
+              type: extension2typeDictionary[file.extension],
             };
           }) ?? [],
         folderList:

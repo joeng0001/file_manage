@@ -54,12 +54,6 @@ export default function header() {
         justifyContent: 'flex-end',
     }));
 
-    const searching = async (keyword) => {
-        console.log("keyword", keyword)
-        const res = await fetch(`/api/searchList?keyword=${keyword}`,)
-        const real_res = await res.json()
-        console.log(real_res)
-    }
     const initOptionsList = async () => {
         console.log("init option list")
         const res = await fetch(`/api/searchList`,)

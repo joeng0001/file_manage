@@ -13,8 +13,12 @@ import 'ace-builds/src-noconflict/mode-php';
 import 'ace-builds/src-noconflict/mode-java';
 import 'ace-builds/src-noconflict/mode-python';
 import 'ace-builds/src-noconflict/mode-csharp';
-
+import 'ace-builds/src-noconflict/mode-ruby'
 import 'ace-builds/src-noconflict/mode-text';
+import 'ace-builds/src-noconflict/mode-swift'
+import 'ace-builds/src-noconflict/mode-rust'
+
+
 
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/theme-twilight';
