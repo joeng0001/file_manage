@@ -32,8 +32,12 @@ export default function AceEditorCom(props) {
         const res = await fetch(`/api/file?name=${props.name}&type=${props.type}&path=${props.path}`)
         const real_res = await res.json()
         console.log("after fetch file content.real res", real_res)
-        const byteCharacters = atob(real_res.content);
-        setContent(byteCharacters)
+        if (real_res.content) {
+            setContent(atob(real_res.content))
+        } else {
+            setContent("")
+        }
+
     }
 
     useEffect(() => {

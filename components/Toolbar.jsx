@@ -4,75 +4,9 @@ import { useState, useRef } from "react"
 import { PiFolderPlusBold, PiFilePlusBold } from 'react-icons/pi'
 import { MdComment, MdFileUpload } from 'react-icons/md'
 import ApiLoading from "@/components/ApiLoading"
+
+import { fileTypeOption } from '@/lib/constant'
 export default function toolbar(props) {
-
-    const fileTypeOption = [
-        {
-            displayName: 'C#',
-            extension: '.cs',
-
-        },
-        {
-            displayName: 'Java',
-            extension: '.java',
-
-        },
-        {
-            displayName: 'Python',
-            extension: '.py',
-
-        },
-        {
-            displayName: 'HTML',
-            extension: '.html',
-
-        },
-        {
-            displayName: 'CSS',
-            extension: '.css',
-
-        },
-        {
-            displayName: 'Javascript',
-            extension: '.js',
-
-        },
-        {
-            displayName: 'PHP',
-            extension: '.php',
-
-        },
-        {
-            displayName: 'Ruby',
-            extension: '.rb',
-
-        },
-        {
-            displayName: 'Swift',
-            extension: '.swift',
-
-        },
-        {
-            displayName: 'Rust',
-            extension: '.rs',
-
-        },
-        {
-            displayName: 'TXT',
-            extension: '.txt',
-
-        },
-        {
-            displayName: 'Doc',
-            extension: '.doc',
-
-        },
-        {
-            displayName: 'Docx',
-            extension: '.docx',
-
-        },
-    ]
 
     const [fileDialog, setFileDialog] = useState(false)
     const [folderDialog, setFolderDialog] = useState(false)
@@ -101,7 +35,7 @@ export default function toolbar(props) {
             {
                 method: "POST",
                 body: JSON.stringify({
-                    name: fileRef.current.value,
+                    name: fileRef.current.value + fileExtension,
                     extension: fileExtension,
                     path: props.path,
                     comment: fileCommentRef.current.value
