@@ -31,6 +31,7 @@ export const GET = async (request, { params }) => {
   const searchParams = new URLSearchParams(url.search);
   const path = searchParams.get("path");
   const name = searchParams.get("name");
+  const type = searchParams.get("type");
   try {
     await connectToDB();
     const pathList = path?.split("/");
@@ -38,13 +39,15 @@ export const GET = async (request, { params }) => {
     console.log("receive path");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
     const fileId = parentFolder.fileList.find(
-      (item) => item.name === name
+      (item) => item.name === name && item.type === type
     )?._id;
     console.log(fileId);
     const file = await File.findById(fileId);
     console.log("send back file", file);
     //dont send complete file,only part of fields
-    return new Response(JSON.stringify("nice"), { status: 200 });
+    return new Response(JSON.stringify({ content: file.base64String }), {
+      status: 200,
+    });
   } catch (error) {
     return new Response("Failed to fetch prompts created by user", {
       status: 500,
@@ -90,6 +93,7 @@ export const POST = async (request, { params }) => {
       _id: new_file._id,
       name: new_file.name,
       type: new_file.type,
+      path: new_file.path,
     });
     const new_parent_folder = await Folder.findByIdAndUpdate(
       parentFolder._id,

@@ -6,7 +6,7 @@ const FolderSchema = new Schema({
     require: [true, "folder name is required"],
     validate: {
       validator: (v) => {
-        return /^[a-zA-Z][a-zA-Z0-9\s]*$/.test(v);
+        return /^[a-zA-Z0-9\s]*$/.test(v);
       },
       message: (props) => `${props.value} include invalid character`,
     },

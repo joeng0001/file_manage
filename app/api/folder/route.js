@@ -7,9 +7,9 @@ import {
 import { auth } from "@clerk/nextjs";
 
 export const GET = async (request, { params }) => {
-  console.log("receive get request of folder", request.url);
-  const a = auth();
-  console.log(a);
+  //console.log("receive get request of folder", request.url);
+  //const a = auth();
+  //console.log(a);
   // if (!userId) throw new Error("not authorized");
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.search);
@@ -24,13 +24,24 @@ export const GET = async (request, { params }) => {
 
     return new Response(
       JSON.stringify({
-        fileList: folder.fileList,
-        folderList: folder.folderList,
+        fileList:
+          folder?.fileList?.map((file) => {
+            return {
+              name: file.name,
+              path: file.path,
+              viewType: "code",
+              type: file.type,
+            };
+          }) ?? [],
+        folderList:
+          folder?.folderList?.map((folder) => {
+            return { name: folder.name, path: folder.path };
+          }) ?? [],
       }),
       { status: 200 }
     );
   } catch (error) {
-    return new Response("Failed to fetch ", {
+    return new Response(JSON.stringify("Failed to fetch "), {
       status: 500,
     });
   }
@@ -60,6 +71,7 @@ export const POST = async (request, { params }) => {
     parentFolder.folderList.push({
       _id: new_folder._id,
       name: new_folder.name,
+      path: new_folder.path,
     });
     const new_parent_folder = await Folder.findByIdAndUpdate(
       parentFolder._id,

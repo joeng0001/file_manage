@@ -155,7 +155,7 @@ export default function toolbar(props) {
 
                 setFile({
                     name: targetFile.name,
-                    type: targetFile.name.split('.').slice(-1),//extension
+                    type: '.' + targetFile.name.split('.').slice(-1)[0],//extension
                     base64String: base64String,
                     path: props.path,
                 })

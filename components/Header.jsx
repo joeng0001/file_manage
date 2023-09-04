@@ -151,20 +151,24 @@ export default function header() {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                    <ListItem disablePadding>
+                    <Link href="/" className="disableLinkStyle" style={{ color: 'black' }}>
+                        <ListItem disablePadding>
+
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <InboxIcon />
+                                </ListItemIcon>
+                                <ListItemText primary={"Home"} />
+                            </ListItemButton>
+
+                        </ListItem>
+                    </Link>
+                    <ListItem disablePadding onClick={() => router.back()}>
                         <ListItemButton>
                             <ListItemIcon>
                                 <InboxIcon />
                             </ListItemIcon>
-                            <ListItemText primary={"hi"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"hi"} />
+                            <ListItemText primary={"Back"} />
                         </ListItemButton>
                     </ListItem>
                 </List>
@@ -189,18 +193,20 @@ export default function header() {
                 </List>
                 <Box sx={{ flexGrow: 1, flexDirection: 'column' }} />
                 <List>
-                    <ListItem disablePadding>
+                    <Link href="/about" className="disableLinkStyle" style={{ color: 'black' }}>
+                        <ListItem disablePadding>
 
-                        <ListItemButton>
-                            <Link href="/about" style={{ textDecoration: 'none', outline: 'none', display: 'flex' }}>
+                            <ListItemButton>
+
                                 <ListItemIcon onClick={() => router.push('/about')}>
                                     <InboxIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={"about"} />
-                            </Link>
-                        </ListItemButton>
 
-                    </ListItem>
+                            </ListItemButton>
+
+                        </ListItem>
+                    </Link>
                 </List>
                 <List>
                     <ListItem disablePadding>
