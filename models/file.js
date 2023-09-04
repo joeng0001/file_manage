@@ -50,6 +50,10 @@ const FileSchema = new Schema({
     type: Date,
     default: () => Date.now(),
   },
+  lastViewAt: {
+    type: Date,
+    default: () => Date.now(),
+  },
 });
 
 const File = models.File || model("File", FileSchema);

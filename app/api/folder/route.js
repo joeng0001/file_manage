@@ -18,10 +18,11 @@ export const GET = async (request, { params }) => {
   try {
     await connectToDB();
     const pathList = path?.split("/");
-    console.log(pathList);
-    console.log("receive path");
+    //console.log(pathList);
+    //console.log("receive path");
     const folder = await getFolder(pathList, 1, pathList.length);
-    console.log("send back folder", folder);
+    //console.log("send back folder", folder);
+    await Folder.findByIdAndUpdate(folder._id, { lastViewAt: new Date() });
 
     return new Response(
       JSON.stringify({
@@ -67,6 +68,7 @@ export const POST = async (request, { params }) => {
       parentFolderId: parentFolder._id,
       level: pathList.length + 1,
       path: req.path,
+      modifiedAt: new Date(),
     });
     const new_folder = await folder.save();
 
@@ -74,6 +76,7 @@ export const POST = async (request, { params }) => {
       _id: new_folder._id,
       name: new_folder.name,
       path: new_folder.path,
+      modifiedAt: new Date(),
     });
     const new_parent_folder = await Folder.findByIdAndUpdate(
       parentFolder._id,
@@ -98,7 +101,7 @@ export const PUT = async (request) => {
     console.log("get folder", folder);
     const new_folder = await Folder.findByIdAndUpdate(
       folder._id,
-      { comment: req.comment },
+      { comment: req.comment, modifiedAt: new Date() },
       { new: true }
     );
     console.log("update folder", new_folder);

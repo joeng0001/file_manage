@@ -70,7 +70,7 @@ export default function fileList({ params, searchParams }) {
                                     ))
                                 }
                             </Grid>
-                            <Toolbar path={pathsList.join("/")} />
+                            <Toolbar path={pathsList.join("/")} fetchData={fetchData} />
                         </>
                 }
             </div>

@@ -4,6 +4,7 @@ import { useState, useRef } from "react"
 import { PiFolderPlusBold, PiFilePlusBold } from 'react-icons/pi'
 import { MdComment, MdFileUpload } from 'react-icons/md'
 import ApiLoading from "@/components/ApiLoading"
+import { BsArrowLeftSquareFill, BsArrowRightSquareFill } from 'react-icons/bs'
 
 import { fileTypeOption } from '@/lib/constant'
 export default function toolbar(props) {
@@ -45,6 +46,7 @@ export default function toolbar(props) {
                 setSnackbarMessage("created")
                 setSnackbarOpen(true)
                 setFileDialog(false)
+                props.fetchData()
             }).catch(err => {
                 setSnackbarSeverity("error")
                 setSnackbarMessage("Error!" + err.message)
@@ -68,6 +70,7 @@ export default function toolbar(props) {
                 setSnackbarMessage("created")
                 setSnackbarOpen(true)
                 setFolderDialog(false)
+                props.fetchData()
             }).catch(err => {
                 setSnackbarSeverity("error")
                 setSnackbarMessage("Error!" + err.message)
@@ -109,6 +112,7 @@ export default function toolbar(props) {
                 setSnackbarMessage("upload success")
                 setSnackbarOpen(true)
                 setConfirmDialog(false)
+                props.fetchData()
             }).catch(err => {
                 setSnackbarSeverity("error")
                 setSnackbarMessage("Error!" + err.message)
@@ -136,6 +140,7 @@ export default function toolbar(props) {
                 setSnackbarSeverity("success")
                 setSnackbarMessage("upload success")
                 setSnackbarOpen(true)
+                props.fetchData()
             }).catch(err => {
                 setSnackbarSeverity("error")
                 setSnackbarMessage("Error!" + err.message)
@@ -187,7 +192,18 @@ export default function toolbar(props) {
                 </Button>
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={apitest}>API test</Button>
-
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button>
+                        <BsArrowLeftSquareFill size={20} />
+                        <span style={{ marginLeft: '10px' }}>
+                            Last Page
+                        </span>
+                    </Button>
+                    <Button>
+                        <span style={{ marginRight: '10px' }}> Next Page</span>
+                        <BsArrowRightSquareFill size={20} />
+                    </Button>
+                </div>
             </div>
             <Dialog
 

@@ -58,6 +58,10 @@ const FolderSchema = new Schema({
     type: Date,
     default: () => Date.now(),
   },
+  lastViewAt: {
+    type: Date,
+    default: () => Date.now(),
+  },
 });
 
 const Folder = models.Folder || model("Folder", FolderSchema);

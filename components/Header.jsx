@@ -22,6 +22,8 @@ export default function header() {
     const router = useRouter()
     const [drawer, setDrawer] = useState(false)
     const [options, setOptions] = useState([])
+    const [recentFileList, setRecentFileList] = useState([])
+    const [recentFolderList, setRecentFolderList] = useState([])
     // Create a custom styled component for the dropdown list
 
     const renderOption = (props, option, state) => {
@@ -77,11 +79,20 @@ export default function header() {
                 }
             })
         ])
+    }
 
+    const initRecentViewList = async () => {
+        console.log("init recent view list")
+        const res = await fetch(`/api/recentView`,)
+        const real_res = await res.json()
+        console.log("recent record", real_res)
+        setRecentFolderList(real_res.folderList)
+        setRecentFileList(real_res.fileList)
     }
 
     useEffect(() => {
         initOptionsList()
+        initRecentViewList()
     }, [])
     return (
         <div>
@@ -168,6 +179,57 @@ export default function header() {
                 </List>
                 <Divider />
                 <List>
+                    <ListItem disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <InboxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"Recent Create Folder"} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <InboxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"bye"} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <InboxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"bye"} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <InboxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"bye"} />
+                        </ListItemButton>
+                    </ListItem>
+                </List>
+                <Divider />
+                <List>
+                    <ListItem disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <InboxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"Recent Create File"} />
+                        </ListItemButton>
+                    </ListItem>
+                    <ListItem disablePadding>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <InboxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={"bye"} />
+                        </ListItemButton>
+                    </ListItem>
                     <ListItem disablePadding>
                         <ListItemButton>
                             <ListItemIcon>

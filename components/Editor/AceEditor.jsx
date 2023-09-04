@@ -52,7 +52,7 @@ export default function AceEditorCom(props) {
                 name="html"
                 value={content}
                 fontSize={14}
-                style={{ height: '60vh', width: '95%', marginTop: '40px', marginBottom: '5px' }}
+                style={{ height: '70vh', width: '95%', marginTop: '40px', marginBottom: '5px' }}
             />
 
 

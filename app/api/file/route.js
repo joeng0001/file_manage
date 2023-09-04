@@ -24,6 +24,8 @@ export const GET = async (request, { params }) => {
     )?._id;
     console.log(fileId);
     const file = await File.findById(fileId);
+    await File.findByIdAndUpdate(file._id, { lastViewAt: new Date() });
+
     console.log("send back file", file);
     //dont send complete file,only part of fields
     return new Response(JSON.stringify({ content: file.base64String }), {
