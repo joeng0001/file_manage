@@ -163,13 +163,13 @@ export default function toolbar(props) {
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={apitest}>API test</Button>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button>
+                    <Button onClick={() => props.lastPage()}>
                         <BsArrowLeftSquareFill size={20} />
                         <span style={{ marginLeft: '10px' }}>
                             Last Page
                         </span>
                     </Button>
-                    <Button>
+                    <Button onClick={() => props.nextPage()}>
                         <span style={{ marginRight: '10px' }}> Next Page</span>
                         <BsArrowRightSquareFill size={20} />
                     </Button>

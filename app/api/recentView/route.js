@@ -7,9 +7,7 @@ export const GET = async (request, { params }) => {
   try {
     await connectToDB();
     const folders = await Folder.find().sort({ lastViewAt: -1 }).limit(3);
-    console.log("get folders", folders);
     const files = await File.find().sort({ lastViewAt: -1 }).limit(3);
-    console.log("get files", files);
     const res = {
       folderList: folders.map((folder) => {
         return {
@@ -26,7 +24,6 @@ export const GET = async (request, { params }) => {
         };
       }),
     };
-    //console.log("send res", res);
     return new Response(JSON.stringify(res), { status: 200 });
   } catch (error) {
     return new Response("Failed to fetch prompts created by user", {

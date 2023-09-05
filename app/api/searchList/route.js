@@ -28,7 +28,6 @@ export const GET = async (request, { params }) => {
         };
       }),
     };
-    console.log("send res", res);
     return new Response(JSON.stringify(res), {
       status: 200,
     });

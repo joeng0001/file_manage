@@ -15,6 +15,8 @@ export const GET = async (request, { params }) => {
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.search);
   const path = searchParams.get("path");
+  const page = searchParams.get("page");
+  console.log(page);
   try {
     await connectToDB();
     const pathList = path?.split("/");
@@ -24,22 +26,24 @@ export const GET = async (request, { params }) => {
     //console.log("send back folder", folder);
     await Folder.findByIdAndUpdate(folder._id, { lastViewAt: new Date() });
 
+    const fileList =
+      folder?.fileList?.map((file) => {
+        return {
+          isFolder: false,
+          name: file.name,
+          path: file.path,
+          viewType: extension2viewType[file.extension],
+          type: extension2typeDictionary[file.extension],
+        };
+      }) ?? [];
+    const folderList =
+      folder?.folderList?.map((folder) => {
+        return { isFolder: true, name: folder.name, path: folder.path };
+      }) ?? [];
+    const list = [...folderList, ...fileList].slice(9 * (page - 1), 9 * page);
     return new Response(
       JSON.stringify({
-        fileList:
-          folder?.fileList?.map((file) => {
-            console.log(extension2typeDictionary[".cs"]);
-            return {
-              name: file.name,
-              path: file.path,
-              viewType: extension2viewType[file.extension],
-              type: extension2typeDictionary[file.extension],
-            };
-          }) ?? [],
-        folderList:
-          folder?.folderList?.map((folder) => {
-            return { name: folder.name, path: folder.path };
-          }) ?? [],
+        list,
       }),
       { status: 200 }
     );
@@ -57,7 +61,6 @@ export const POST = async (request, { params }) => {
     const pathList = req.path?.split("/");
     await createRootFolderIfNotExist(pathList[0]);
     const parentFolder = await getFolder(pathList, 1, pathList.length);
-    console.log("get parent folder", parentFolder);
     if (parentFolder.folderList.find((folder) => folder.name === req.name)) {
       console.log("folder existed");
       throw new Error("folder already exist");
@@ -98,13 +101,12 @@ export const PUT = async (request) => {
     const pathList = req.path?.split("/");
     const folder = await getFolder(pathList, 1, pathList.length);
 
-    console.log("get folder", folder);
     const new_folder = await Folder.findByIdAndUpdate(
       folder._id,
       { comment: req.comment, modifiedAt: new Date() },
       { new: true }
     );
-    console.log("update folder", new_folder);
+
     return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {
     return new Response("Failed to fetch prompts created by user", {
