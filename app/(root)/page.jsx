@@ -7,8 +7,6 @@ import { homeList } from '@/lib/constant'
 //import {usePathname,useRouter} from 'next/navigation'
 import { dark } from '@clerk/themes'
 import { Grid, Box } from '@mui/material'
-
-
 export default function Home() {
   return (
     <div className="homeBackGround">

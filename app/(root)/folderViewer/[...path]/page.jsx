@@ -5,6 +5,10 @@ import Toolbar from "@/components/Toolbar"
 import { FcOpenedFolder, FcFile } from "react-icons/fc"
 import { useEffect, useState } from 'react'
 import ApiLoading from "@/components/ApiLoading"
+// import dynamic from "next/dynamic";
+// const Toolbar = dynamic(() => import('@/components/Toolbar'), {
+//     ssr: false,
+// })
 export default function fileList({ params, searchParams }) {
     const [loading, setLoading] = useState(false)
     const [fileList, setFileList] = useState([])
@@ -22,8 +26,8 @@ export default function fileList({ params, searchParams }) {
         const res = await fetch(`/api/folder?path=${pathsList.join('/')}`)
         const real_res = await res.json()
         console.log(real_res)
-        setFileList(real_res.fileList)
-        setFolderList(real_res.folderList)
+        setFileList(() => real_res.fileList)
+        setFolderList(() => real_res.folderList)
         setLoading(false)
     }
     useEffect(() => {
@@ -45,7 +49,7 @@ export default function fileList({ params, searchParams }) {
                         <>
                             <Grid container>
                                 {
-                                    folderList.map(folder => (
+                                    folderList?.map(folder => (
                                         <Grid item xs={4} key={folder.name}>
                                             <Link href={`/folderViewer/${folder.path}/${folder.name}/?page=1`} className="disableLinkStyle">
                                                 <Box className="Box">
@@ -58,7 +62,7 @@ export default function fileList({ params, searchParams }) {
                                 }
 
                                 {
-                                    fileList.map(file => (
+                                    fileList?.map(file => (
                                         <Grid item xs={4} key={file.name}>
                                             <Link href={`/fileViewer/${file.viewType}/${file.path}?name=${file.name}&type=${file.type}`} className="disableLinkStyle">
                                                 <Box className="Box">

@@ -10,6 +10,7 @@ import { styled, } from '@mui/material/styles';
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
+
 import { FcFolder, FcDocument, FcHome, FcAbout } from "react-icons/fc"
 import { ImFilesEmpty } from "react-icons/im"
 import { PiFoldersBold } from "react-icons/pi"
@@ -24,6 +25,8 @@ const SignOutButton = dynamic(() => import('@clerk/nextjs').then((module) => mod
 })
 export default function header() {
     const router = useRouter()
+
+    const [loadingSearchList, setLoadingSearchList] = useState(false)
     const [drawer, setDrawer] = useState(false)
     const [options, setOptions] = useState([])
     const [recentFileList, setRecentFileList] = useState([])
@@ -36,7 +39,7 @@ export default function header() {
         return (
 
 
-            <li {...props} key={option.id} style={{ backgroundColor }}>
+            <li {...props} key={option.id} style={{ backgroundColor }} >
                 <Tooltip title={option.path ?? 'path not provided'} placement="right">
                     <div>
                         <span style={{ fontWeight: 600 }}>
@@ -61,6 +64,7 @@ export default function header() {
     }));
 
     const initOptionsList = async () => {
+        setLoadingSearchList(true)
         console.log("init option list")
         const res = await fetch(`/api/searchList`,)
         const real_res = await res.json()
@@ -69,20 +73,17 @@ export default function header() {
             ...real_res.files.map((file) => {
                 return {
                     label: 'file',
-                    name: file.name,
-                    id: file.id,
-                    path: file.path
+                    ...file
                 }
             }),
             ...real_res.folders.map((folder) => {
                 return {
                     label: 'folder',
-                    name: folder.name,
-                    id: folder.id,
-                    path: folder.path
+                    ...folder
                 }
             })
         ])
+        setLoadingSearchList(false)
     }
 
     const initRecentViewList = async () => {
@@ -133,6 +134,13 @@ export default function header() {
                             renderInput={params => <TextField  {...params} placeholder="Search" />}
                             className="Search_TextField"
                             onOpen={initOptionsList}
+                            noOptionsText={loadingSearchList ? "Loading..." : "no options available"}
+                            onChange={(e, option) => router.push(
+                                option.label === 'folder' ?
+                                    `/folderViewer/${option.path}/${option.name}` :
+                                    `/fileViewer/${option.viewType}/${option.path}?name=${option.name}&type=${option.type}`
+
+                            )}
                         />
                         <Box sx={{ flexGrow: 1 }} />
 
@@ -219,7 +227,7 @@ export default function header() {
                             <ListItemIcon>
                                 <ImFilesEmpty />
                             </ListItemIcon>
-                            <ListItemText primary={"Recent Create File"} />
+                            <ListItemText primary={"Recent Viewed File"} />
                             <IoReload />
 
                         </ListItemButton>
@@ -246,10 +254,9 @@ export default function header() {
                 <List style={{ marginBottom: '10px' }}>
                     <Link href="/about" className="disableLinkStyle" style={{ color: 'black' }}>
                         <ListItem disablePadding>
-
                             <ListItemButton>
 
-                                <ListItemIcon onClick={() => router.push('/about')}>
+                                <ListItemIcon>
                                     <FcAbout />
                                 </ListItemIcon>
                                 <ListItemText primary={"about"} />
