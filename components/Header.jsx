@@ -1,6 +1,4 @@
 "use client"
-
-import Image from "next/image";
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
@@ -8,10 +6,16 @@ import { AppBar, Toolbar, IconButton, Typography, Autocomplete, TextField, Box, 
 import MenuIcon from "@mui/icons-material/Menu"
 import SearchIcon from "@mui/icons-material/Search";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
-import InboxIcon from "@mui/icons-material/Inbox"
-import { styled, useTheme } from '@mui/material/styles';
+import { styled, } from '@mui/material/styles';
 import Link from "next/link";
 import dynamic from "next/dynamic";
+
+import { FcFolder, FcDocument, FcHome, FcAbout } from "react-icons/fc"
+import { ImFilesEmpty } from "react-icons/im"
+import { PiFoldersBold } from "react-icons/pi"
+import { RiArrowGoBackFill } from "react-icons/ri"
+import { BiLogOut } from "react-icons/bi"
+import { IoReload } from "react-icons/io5"
 const UserButton = dynamic(() => import('@clerk/nextjs').then((module) => module.UserButton), {
     ssr: false,
 })
@@ -140,10 +144,10 @@ export default function header() {
                 anchor={'left'}
                 open={drawer}
                 sx={{
-                    width: 240,
+                    width: 320,
                     flexShrink: 0,
                     '& .MuiDrawer-paper': {
-                        width: 240,
+                        width: 320,
                         boxSizing: 'border-box',
                     },
                 }}
@@ -161,7 +165,7 @@ export default function header() {
 
                             <ListItemButton>
                                 <ListItemIcon>
-                                    <InboxIcon />
+                                    <FcHome />
                                 </ListItemIcon>
                                 <ListItemText primary={"Home"} />
                             </ListItemButton>
@@ -171,91 +175,82 @@ export default function header() {
                     <ListItem disablePadding onClick={() => router.back()}>
                         <ListItemButton>
                             <ListItemIcon>
-                                <InboxIcon />
+                                <RiArrowGoBackFill />
                             </ListItemIcon>
-                            <ListItemText primary={"Back"} />
+                            <ListItemText primary={"Back to last page"} />
                         </ListItemButton>
                     </ListItem>
                 </List>
                 <Divider />
                 <List>
-                    <ListItem disablePadding>
+                    <ListItem disablePadding onClick={initRecentViewList}>
                         <ListItemButton>
                             <ListItemIcon>
-                                <InboxIcon />
+                                <PiFoldersBold />
                             </ListItemIcon>
-                            <ListItemText primary={"Recent Create Folder"} />
+                            <ListItemText primary={"Recent Viewed Folder"} />
+
+                            <IoReload />
                         </ListItemButton>
                     </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"bye"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"bye"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"bye"} />
-                        </ListItemButton>
-                    </ListItem>
+                    {
+                        recentFolderList.map(folder => {
+                            return (
+                                <Link key={folder.path + folder.name} href={`/folderViewer/${folder.path}/${folder.name}?page=1`} className="disableLinkStyle" style={{ color: 'black' }}>
+                                    <ListItem disablePadding>
+                                        <ListItemButton>
+                                            <ListItemIcon>
+                                                <FcFolder />
+                                            </ListItemIcon>
+                                            <ListItemText primary={folder.name} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                </Link>
+                            )
+                        })
+                    }
+
+
                 </List>
                 <Divider />
                 <List>
-                    <ListItem disablePadding>
+                    <ListItem disablePadding onClick={initRecentViewList}>
                         <ListItemButton>
                             <ListItemIcon>
-                                <InboxIcon />
+                                <ImFilesEmpty />
                             </ListItemIcon>
                             <ListItemText primary={"Recent Create File"} />
+                            <IoReload />
+
                         </ListItemButton>
                     </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"bye"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"bye"} />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <InboxIcon />
-                            </ListItemIcon>
-                            <ListItemText primary={"bye"} />
-                        </ListItemButton>
-                    </ListItem>
+                    {
+                        recentFileList.map(file => {
+                            return (
+                                <Link key={file.path + file.name} href={`/fileViewer/${file.viewType}/${file.path}?name=${file.name}&type=${file.type}`} className="disableLinkStyle" style={{ color: 'black' }}>
+                                    <ListItem disablePadding>
+                                        <ListItemButton>
+                                            <ListItemIcon>
+                                                <FcDocument />
+                                            </ListItemIcon>
+                                            <ListItemText primary={file.name} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                </Link>
+                            )
+                        })
+                    }
+
                 </List>
                 <Box sx={{ flexGrow: 1, flexDirection: 'column' }} />
-                <List>
+                <List style={{ marginBottom: '10px' }}>
                     <Link href="/about" className="disableLinkStyle" style={{ color: 'black' }}>
                         <ListItem disablePadding>
 
                             <ListItemButton>
 
                                 <ListItemIcon onClick={() => router.push('/about')}>
-                                    <InboxIcon />
+                                    <FcAbout />
                                 </ListItemIcon>
                                 <ListItemText primary={"about"} />
 
@@ -263,20 +258,13 @@ export default function header() {
 
                         </ListItem>
                     </Link>
-                </List>
-                <List>
-                    <ListItem disablePadding>
+                    <ListItem disablePadding >
                         <SignOutButton
                             signOutCallback={() => router.push('/sign-in')}
                         >
                             <ListItemButton>
                                 <ListItemIcon>
-                                    <Image
-                                        src="/assets/door.svg"
-                                        alt="logout"
-                                        width={24}
-                                        height={24}
-                                    />
+                                    <BiLogOut />
                                 </ListItemIcon>
                                 <ListItemText primary={"sign out"} />
                             </ListItemButton>

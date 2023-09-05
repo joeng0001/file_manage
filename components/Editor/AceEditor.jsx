@@ -25,8 +25,6 @@ import 'ace-builds/src-noconflict/theme-twilight';
 export default function AceEditorCom(props) {
 
     const [content, setContent] = useState()
-    const [comment, setComment] = useState()
-
     const fetchFileContent = async () => {
         console.log("fetchong file content", props.name, props.type, props.path)
         const res = await fetch(`/api/file?name=${props.name}&type=${props.type}&path=${props.path}`)
@@ -42,10 +40,9 @@ export default function AceEditorCom(props) {
 
     useEffect(() => {
         fetchFileContent()
-    }, [])
+    }, [props.name, props.type, props.path])
     return (
         <>
-            {/* <input type='file' accept=".html, .css, .js" onChange={(e) => fileSelect(e)} /> */}
             <AceEditor
                 mode="java"
                 theme="twilight"
