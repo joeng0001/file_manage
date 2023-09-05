@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-
+import ApiLoading from "@/components/ApiLoading"
 import AceEditor from 'react-ace'
 
 // warning can be safely ignore -> file is renamed by next js default behaviour
@@ -23,11 +23,11 @@ export default function AceEditorCom(props) {
 
 
     const [content, setContent] = useState("Content Loading...")
-
+    const [loading, setLoading] = useState(true)
 
 
     const fetchFileContent = async () => {
-
+        setLoading(true)
 
         console.log("fetchong file content", props.name, props.type, props.path)
         const res = await fetch(`/api/file?name=${props.name}&type=${props.type}&path=${props.path}`)
@@ -39,24 +39,30 @@ export default function AceEditorCom(props) {
             setContent("")
         }
 
-
+        setLoading(false)
     }
 
     useEffect(() => {
         fetchFileContent()
     }, [props.name, props.type, props.path])
     return (
-        <>
-            <AceEditor
-                mode="java"
-                theme="twilight"
-                name="html"
-                fontSize={14}
-                style={{ height: '70vh', width: '95%', marginTop: '40px', marginBottom: '5px' }}
-                value={content}
-            />
+        <div>
+            {
+                loading ?
 
 
-        </>
+                    <ApiLoading />
+
+                    :
+                    <AceEditor
+                        mode={`${props.type}`}
+                        theme="twilight"
+                        fontSize={14}
+                        style={{ height: '70vh', width: '95%', marginTop: '40px', marginBottom: '5px' }}
+                        defaultValue={content}
+                    />
+            }
+
+        </div>
     )
 }
