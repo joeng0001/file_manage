@@ -1,5 +1,5 @@
 "use client"
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert, Autocomplete, Tooltip } from "@mui/material"
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Autocomplete, Tooltip } from "@mui/material"
 import { useState, useRef } from "react"
 import { PiFolderPlusBold, PiFilePlusBold } from 'react-icons/pi'
 import { MdComment, MdFileUpload } from 'react-icons/md'
@@ -14,9 +14,6 @@ export default function toolbar(props) {
     const [confirmDialog, setConfirmDialog] = useState(false)
     const [commentsDialog, setCommentsDialog] = useState(false)
 
-    const [snackbarOpen, setSnackbarOpen] = useState(false)
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success')
-    const [snackbarMessage, setSnackbarMessage] = useState("")
 
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState({})
@@ -25,12 +22,6 @@ export default function toolbar(props) {
     const [uploadButtonRef, fileRef, folderRef, fileCommentRef, folderCommentRef, commentsRef, confirmFileCommentRef] = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
     const createFile = async () => {
         setLoading(true)
-        console.log({
-            name: fileRef.current.value,
-            extension: fileExtension,
-            path: props.path,
-            comment: fileCommentRef.current.value
-        })
         //create file,then redirect user to edit page to contuinue the creation
         await fetch('/api/file',
             {
@@ -42,15 +33,11 @@ export default function toolbar(props) {
                     comment: fileCommentRef.current.value
                 })
             }).then(res => {
-                setSnackbarSeverity("success")
-                setSnackbarMessage("created")
-                setSnackbarOpen(true)
+                props.controlSnackbar("true", "success", "empty file created")
                 setFileDialog(false)
                 props.fetchData()
             }).catch(err => {
-                setSnackbarSeverity("error")
-                setSnackbarMessage("Error!" + err.message)
-                setSnackbarOpen(true)
+                props.controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
                 setLoading(false)
             })
@@ -66,19 +53,14 @@ export default function toolbar(props) {
                     comments: folderCommentRef.current.value
                 })
             }).then(res => {
-                setSnackbarSeverity("success")
-                setSnackbarMessage("created")
-                setSnackbarOpen(true)
+                props.controlSnackbar(true, "success", "empty folder created")
                 setFolderDialog(false)
                 props.fetchData()
             }).catch(err => {
-                setSnackbarSeverity("error")
-                setSnackbarMessage("Error!" + err.message)
-                setSnackbarOpen(true)
+                props.controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
                 setLoading(false)
             })
-        setLoading(false)
     }
 
     const fileSelect = async (e) => {
@@ -108,15 +90,11 @@ export default function toolbar(props) {
                 method: "POST",
                 body: JSON.stringify({ ...file, comments: confirmFileCommentRef.current.value })
             }).then(res => {
-                setSnackbarSeverity("success")
-                setSnackbarMessage("upload success")
-                setSnackbarOpen(true)
+                props.controlSnackbar(true, "success", "file uploaded")
                 setConfirmDialog(false)
                 props.fetchData()
             }).catch(err => {
-                setSnackbarSeverity("error")
-                setSnackbarMessage("Error!" + err.message)
-                setSnackbarOpen(true)
+                props.controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
                 setFile(null)
                 setLoading(false)
@@ -124,9 +102,7 @@ export default function toolbar(props) {
     }
     const cancelUpload = () => {
         setFile(null)
-        setSnackbarSeverity("warning")
-        setSnackbarMessage("Upload Cancelled")
-        setSnackbarOpen(true)
+        props.controlSnackbar(true, "warning", "Upload Cancelled")
         setConfirmDialog(false)
     }
 
@@ -137,14 +113,10 @@ export default function toolbar(props) {
                 method: "PUT",
                 body: JSON.stringify({ comment: commentsRef.current.value, path: props.path })
             }).then(res => {
-                setSnackbarSeverity("success")
-                setSnackbarMessage("upload success")
-                setSnackbarOpen(true)
+                props.controlSnackbar(true, "success", "Comment Saved")
                 props.fetchData()
             }).catch(err => {
-                setSnackbarSeverity("error")
-                setSnackbarMessage("Error!" + err.message)
-                setSnackbarOpen(true)
+                props.controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
                 setCommentsDialog(false)
                 setLoading(false)
@@ -153,13 +125,11 @@ export default function toolbar(props) {
 
     const apitest = async () => {
         //console.log(props.path)
-        await fetch(`/api/folder?path=java`,)
+        await fetch(`/api/folder?path=java`)
             .then(async (res) => {
                 const a = await res.json()
                 console.log(a)
-                setSnackbarSeverity("success")
-                setSnackbarMessage("upload success")
-                setSnackbarOpen(true)
+                props.controlSnackbar(true, "success", "uplaod success")
             })
     }
 
@@ -327,11 +297,6 @@ export default function toolbar(props) {
                         </div>
                 }
             </Dialog>
-            <Snackbar open={snackbarOpen} autoHideDuration={5000} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-                <Alert severity={snackbarSeverity} sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
         </div>
 
     )

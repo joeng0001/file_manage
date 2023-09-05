@@ -5,21 +5,29 @@ import Toolbar from "@/components/Toolbar"
 import { FcOpenedFolder, FcFile } from "react-icons/fc"
 import { useEffect, useState } from 'react'
 import ApiLoading from "@/components/ApiLoading"
-// import dynamic from "next/dynamic";
-// const Toolbar = dynamic(() => import('@/components/Toolbar'), {
-//     ssr: false,
-// })
+import Snackbar from "@/components/Snackbar"
+
+
 export default function fileList({ params, searchParams }) {
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [fileList, setFileList] = useState([])
     const [folderList, setFolderList] = useState([])
+
+    const [snackbarOpen, setSnackbarOpen] = useState(false)
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success')
+    const [snackbarMessage, setSnackbarMessage] = useState("")
+
     const pathsList = params?.path
     const page = searchParams?.page
     //console.log(params,searchParams)
     //console.log(item)
 
     //const [fileList, folderList] = [res.fileList, res.folderList]
-
+    const controlSnackbar = (open, severity, message) => {
+        setSnackbarSeverity(severity)
+        setSnackbarMessage(message)
+        setSnackbarOpen(open)
+    }
 
     const fetchData = async () => {
         setLoading(true)
@@ -74,10 +82,12 @@ export default function fileList({ params, searchParams }) {
                                     ))
                                 }
                             </Grid>
-                            <Toolbar path={pathsList.join("/")} fetchData={fetchData} />
+                            <Toolbar path={pathsList.join("/")} fetchData={fetchData} controlSnackbar={controlSnackbar} />
                         </>
                 }
+
             </div>
+            <Snackbar snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
         </div>
     )
 }
