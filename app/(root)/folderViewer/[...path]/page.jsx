@@ -54,11 +54,6 @@ export default function fileList({ params, searchParams }) {
     // prompt dialog ,get name  and create file ,then redirect to that page
     return (
         <div className="homeBackGround">
-            {
-                (folderList?.length > 0 && fileList?.length > 0) ? <></> : <div style={{
-                    display: 'flex', justifyContent: 'center', width: '100%'
-                }}>Empty Folder</div>
-            }
             <div className="GridContainer">
                 {
                     loading ?
@@ -90,6 +85,11 @@ export default function fileList({ params, searchParams }) {
                                             </Link>
                                         </Grid>
                                     ))
+                                }
+                                {
+                                    (folderList?.length > 0 || fileList?.length > 0) ? <></> : <div style={{
+                                        display: 'flex', justifyContent: 'center', width: '100%'
+                                    }}>Empty Folder</div>
                                 }
                             </Grid>
                             <Toolbar path={pathsList.join("/")} fetchData={fetchData} controlSnackbar={controlSnackbar} nextPage={nextPage} lastPage={lastPage} />

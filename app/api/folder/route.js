@@ -102,7 +102,7 @@ export const PUT = async (request) => {
     const pathList = req.path?.split("/");
     const folder = await getFolder(pathList, 1, pathList.length);
 
-    const new_folder = await Folder.findByIdAndUpdate(
+    await Folder.findByIdAndUpdate(
       folder._id,
       { comment: req.comment, modifiedAt: new Date() },
       { new: true }
@@ -154,6 +154,19 @@ export const DELETE = async (request) => {
           );
     console.log("current folder", currentFolder);
     await dfsDelete(currentFolder);
+
+    if (parentFolder._id !== currentFolder._id) {
+      await Folder.findByIdAndUpdate(
+        parentFolder._id,
+        {
+          folderList: parentFolder.folderList.filter(
+            (folder) => folder.name !== currentFolder.name
+          ),
+          modifiedAt: new Date(),
+        },
+        { new: true }
+      );
+    }
     return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {
     console.error(error);

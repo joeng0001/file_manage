@@ -84,12 +84,35 @@ export const POST = async (request, { params }) => {
 export const PUT = async (request) => {};
 
 export const DELETE = async (request) => {
-  const req = await request.json();
-  await connectToDB();
-  const pathList = req.path?.split("/");
-  const parentFolder = await getFolder(pathList, 1, pathList.length);
-  const fileList = parentFolder.fileList;
-  const fileId = fileList.find((item) => item.name === req.name);
-  await File.deleteOne({ _id: fileId });
-  return new Response(JSON.stringify({ data: "success" }), { status: 200 });
+  try {
+    const req = await request.json();
+    console.log("receive file delete request", req);
+    await connectToDB();
+    const pathList = req.path?.split("/");
+    const parentFolder = await getFolder(pathList, 1, pathList.length);
+    console.log("get parent folder", parentFolder);
+    const fileObj = parentFolder?.fileList?.find(
+      (item) => item.name === req.name
+    );
+
+    console.log("get file", fileObj);
+    await File.deleteOne({ _id: fileObj._id });
+    console.log("after delete file");
+    const newfolder = await Folder.findByIdAndUpdate(
+      parentFolder._id,
+      {
+        fileList: parentFolder.fileList.filter(
+          (file) => file.name !== fileObj.name
+        ),
+        modifiedAt: new Date(),
+      },
+      { new: true }
+    );
+    console.log("after delte from folder", newfolder);
+    return new Response(JSON.stringify({ data: "success" }), { status: 200 });
+  } catch (error) {
+    return new Response("Error during delete", {
+      status: 500,
+    });
+  }
 };

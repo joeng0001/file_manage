@@ -5,10 +5,9 @@ import { PiFolderPlusBold, PiFilePlusBold } from 'react-icons/pi'
 import { MdComment, MdFileUpload } from 'react-icons/md'
 import ApiLoading from "@/components/ApiLoading"
 import { BsArrowLeftSquareFill, BsArrowRightSquareFill } from 'react-icons/bs'
-
 import { fileTypeOption } from '@/lib/constant'
+import { useRouter } from "next/navigation"
 export default function toolbar(props) {
-
     const [fileDialog, setFileDialog] = useState(false)
     const [folderDialog, setFolderDialog] = useState(false)
     const [confirmUploadDialog, setConfirmUploadDialog] = useState(false)
@@ -22,7 +21,6 @@ export default function toolbar(props) {
     const [uploadButtonRef, fileRef, folderRef, fileCommentRef, folderCommentRef, commentsRef, confirmFileCommentRef] = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
     const createFile = async () => {
         setLoading(true)
-        //create file,then redirect user to edit page to contuinue the creation
         await fetch('/api/file',
             {
                 method: "POST",
@@ -33,7 +31,7 @@ export default function toolbar(props) {
                     comment: fileCommentRef.current.value
                 })
             }).then(res => {
-                props.controlSnackbar("true", "success", "empty file created")
+                props.controlSnackbar(true, "success", "empty file created")
                 setFileDialog(false)
                 props.fetchData()
             }).catch(err => {

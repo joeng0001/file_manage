@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import ApiLoading from "@/components/ApiLoading"
 import AceEditor from 'react-ace'
 
@@ -20,48 +20,26 @@ import 'ace-builds/src-noconflict/theme-twilight';
 
 
 export default function AceEditorCom(props) {
-
-
-    const [content, setContent] = useState("Content Loading...")
-    const [loading, setLoading] = useState(true)
-
-
-    const fetchFileContent = async () => {
-        setLoading(true)
-
-        console.log("fetchong file content", props.name, props.type, props.path)
-        const res = await fetch(`/api/file?name=${props.name}&type=${props.type}&path=${props.path}`)
-        const real_res = await res.json()
-        console.log("after fetch file content.real res", real_res)
-        if (real_res.content) {
-            setContent(atob(real_res.content))
-        } else {
-            setContent("")
-        }
-
-        setLoading(false)
-    }
-
+    const editorRef = useRef()
     useEffect(() => {
-        fetchFileContent()
-    }, [props.name, props.type, props.path])
+        console.log(editorRef.current)
+        console.log("new content", props.content)
+        editorRef.current.editor.setValue(props.content)
+    }, [props.content])
     return (
         <div>
-            {
-                loading ?
+
+            <AceEditor
+                ref={editorRef}
+                mode={`${props.type}`}
+                theme="twilight"
+                fontSize={14}
+                style={{ height: '70vh', width: '95%', marginTop: '40px', marginBottom: '5px' }}
 
 
-                    <ApiLoading />
+                placeholder="Empty File ..."
+            />
 
-                    :
-                    <AceEditor
-                        mode={`${props.type}`}
-                        theme="twilight"
-                        fontSize={14}
-                        style={{ height: '70vh', width: '95%', marginTop: '40px', marginBottom: '5px' }}
-                        defaultValue={content}
-                    />
-            }
 
         </div>
     )
