@@ -90,12 +90,6 @@ export const DELETE = async (request) => {
   const parentFolder = await getFolder(pathList, 1, pathList.length);
   const fileList = parentFolder.fileList;
   const fileId = fileList.find((item) => item.name === req.name);
-  const file = await File.findByIdAndUpdate(
-    fileId,
-    {
-      isDeleted: true,
-    },
-    { new: true }
-  );
+  await File.deleteOne({ _id: fileId });
   return new Response(JSON.stringify({ data: "success" }), { status: 200 });
 };

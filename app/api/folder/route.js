@@ -1,4 +1,5 @@
 import Folder from "@/models/folder";
+import File from "@/models/file";
 import {
   connectToDB,
   createRootFolderIfNotExist,
@@ -115,8 +116,45 @@ export const PUT = async (request) => {
   }
 };
 
-export const Delete = async (request) => {
+const dfsDelete = async (currentFolderObj) => {
+  if (!currentFolderObj) return;
+  console.log("start delete");
+  const currentfolder = await Folder.findOne({
+    _id: currentFolderObj._id,
+  });
+  console.log("get current folder", currentfolder);
+  const deleteFiles = currentfolder?.fileList?.map(async (file) => {
+    console.log("delete file", file);
+    await File.deleteOne({ _id: file._id });
+  });
+  const deleteFolders = currentfolder?.folderList?.map(async (folder) => {
+    await dfsDelete(folder);
+    console.log("delete folder", folder);
+    await Folder.deleteOne({ _id: folder._id });
+  });
+  const deleteCurrentFolder = await Folder.deleteOne({
+    _id: currentfolder._id,
+  });
+  await Promise.all([deleteFiles, deleteFolders, deleteCurrentFolder]);
+  return;
+};
+
+export const DELETE = async (request) => {
   try {
+    const req = await request.json();
+    await connectToDB();
+    const pathList = req.path?.split("/");
+    const parentFolder = await getFolder(pathList, 1, pathList.length - 1);
+    const currentFolderName = pathList[pathList.length - 1];
+    const currentFolder =
+      parentFolder.level === 1
+        ? parentFolder
+        : parentFolder.folderList.find(
+            (folder) => folder.name === currentFolderName
+          );
+    console.log("current folder", currentFolder);
+    await dfsDelete(currentFolder);
+    return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {
     console.error(error);
   }

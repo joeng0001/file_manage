@@ -55,7 +55,7 @@ export default function fileList({ params, searchParams }) {
     return (
         <div className="homeBackGround">
             {
-                (folderList && fileList) ? <></> : <div style={{
+                (folderList?.length > 0 && fileList?.length > 0) ? <></> : <div style={{
                     display: 'flex', justifyContent: 'center', width: '100%'
                 }}>Empty Folder</div>
             }

@@ -11,9 +11,9 @@ export default function toolbar(props) {
 
     const [fileDialog, setFileDialog] = useState(false)
     const [folderDialog, setFolderDialog] = useState(false)
-    const [confirmDialog, setConfirmDialog] = useState(false)
+    const [confirmUploadDialog, setConfirmUploadDialog] = useState(false)
     const [commentsDialog, setCommentsDialog] = useState(false)
-
+    const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
 
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState({})
@@ -62,7 +62,6 @@ export default function toolbar(props) {
                 setLoading(false)
             })
     }
-
     const fileSelect = async (e) => {
         if (e.target.files) {
             const targetFile = e.target.files[0]
@@ -79,7 +78,7 @@ export default function toolbar(props) {
                     path: props.path,
                 })
 
-                setConfirmDialog(true)
+                setConfirmUploadDialog(true)
             }
         }
     }
@@ -91,7 +90,7 @@ export default function toolbar(props) {
                 body: JSON.stringify({ ...file, comments: confirmFileCommentRef.current.value })
             }).then(res => {
                 props.controlSnackbar(true, "success", "file uploaded")
-                setConfirmDialog(false)
+                setConfirmUploadDialog(false)
                 props.fetchData()
             }).catch(err => {
                 props.controlSnackbar(true, "error", "Error!" + err.message)
@@ -103,9 +102,8 @@ export default function toolbar(props) {
     const cancelUpload = () => {
         setFile(null)
         props.controlSnackbar(true, "warning", "Upload Cancelled")
-        setConfirmDialog(false)
+        setConfirmUploadDialog(false)
     }
-
     const saveComments = async () => {
         setLoading(true)
         await fetch('/api/folder',
@@ -122,7 +120,6 @@ export default function toolbar(props) {
                 setLoading(false)
             })
     }
-
     const apitest = async () => {
         //console.log(props.path)
         await fetch(`/api/folder?path=java`)
@@ -132,7 +129,6 @@ export default function toolbar(props) {
                 props.controlSnackbar(true, "success", "uplaod success")
             })
     }
-
     const renderOption = (props, option, state) => {
         console.log(props, option)
         return (
@@ -146,6 +142,22 @@ export default function toolbar(props) {
 
         );
     };
+    const confirmDeleteFolder = async () => {
+        setLoading(true)
+        await fetch('/api/folder',
+            {
+                method: "DELETE",
+                body: JSON.stringify({ path: props.path })
+            }).then(res => {
+                props.controlSnackbar(true, "success", "folder deleted")
+                props.fetchData()
+            }).catch(err => {
+                props.controlSnackbar(true, "error", "Error!" + err.message)
+            }).finally(() => {
+                setConfirmDeleteDialog(false)
+                setLoading(false)
+            })
+    }
 
     return (
 
@@ -160,6 +172,7 @@ export default function toolbar(props) {
                         onChange={(e) => fileSelect(e)} className="HidedButton" />
 
                 </Button>
+                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
                 <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={apitest}>API test</Button>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -242,7 +255,7 @@ export default function toolbar(props) {
             <Dialog
                 fullWidth={true}
                 maxWidth='sm'
-                open={confirmDialog}
+                open={confirmUploadDialog}
             >
                 <DialogTitle>
                     Confirm Required
@@ -296,6 +309,32 @@ export default function toolbar(props) {
                             </DialogActions>
                         </div>
                 }
+            </Dialog>
+            <Dialog
+                fullWidth={true}
+                maxWidth='sm'
+                open={confirmDeleteDialog}
+            >
+                <DialogTitle>
+                    <span style={{ fontSize: '24px', fontWeight: '300', color: 'red' }}>Alert</span>
+                </DialogTitle>
+                {
+                    loading ?
+                        <DialogContent>
+                            <ApiLoading />
+                        </DialogContent>
+                        :
+                        <div>
+                            <DialogContent>
+                                Delete folder <span style={{ fontSize: '24px', fontWeight: '200', color: 'red' }}>{props.path.split('/').pop()}</span> will delete all Folders And Files inside it!
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setConfirmDeleteDialog(false)}>Cancel</Button>
+                                <Button onClick={confirmDeleteFolder}>Confirm</Button>
+                            </DialogActions>
+                        </div>
+                }
+
             </Dialog>
         </div>
 

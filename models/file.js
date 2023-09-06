@@ -26,10 +26,6 @@ const FileSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
   comments: {
     type: String,
     default: "",
