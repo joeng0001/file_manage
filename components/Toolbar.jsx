@@ -6,7 +6,8 @@ import { MdComment, MdFileUpload } from 'react-icons/md'
 import ApiLoading from "@/components/ApiLoading"
 import { BsArrowLeftSquareFill, BsArrowRightSquareFill } from 'react-icons/bs'
 import { fileTypeOption } from '@/lib/constant'
-import { useRouter } from "next/navigation"
+import { cyan, pink, lightGreen, purple, brown, lightBlue } from '@mui/material/colors'
+
 export default function toolbar(props) {
     const [fileDialog, setFileDialog] = useState(false)
     const [folderDialog, setFolderDialog] = useState(false)
@@ -162,25 +163,25 @@ export default function toolbar(props) {
         <div>
             <div className="toolbar">
 
-                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setFileDialog(true)}><PiFilePlusBold />Create File</Button>
-                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setFolderDialog(true)}><PiFolderPlusBold />Create Folder</Button>
-                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => { uploadButtonRef.current.click() }}>
+                <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: brown[400] }} onClick={() => setFileDialog(true)}><PiFilePlusBold />Create File</Button>
+                <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: lightBlue[400] }} onClick={() => setFolderDialog(true)}><PiFolderPlusBold />Create Folder</Button>
+                <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: cyan[400] }} onClick={() => { uploadButtonRef.current.click() }}>
                     <MdFileUpload />Upload File
                     <input ref={uploadButtonRef} type='file' accept=".jpg, .pdf, .png, .cs,.java,.py,.html,.css,.js,.php,.rb,.swift,.rs,.txt,.doc,.docx"
                         onChange={(e) => fileSelect(e)} className="HidedButton" />
 
                 </Button>
-                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
-                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
-                <Button variant="outlined" style={{ marginBottom: '10px' }} onClick={apitest}>API test</Button>
+                <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: pink[400] }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
+                <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: lightGreen[400] }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
+                <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: purple[400] }} onClick={apitest}>API test</Button>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button onClick={() => props.lastPage()}>
+                    <Button onClick={() => props.lastPage()} variant="contained" style={{ marginRight: '5px', backgroundColor: purple[400] }}>
                         <BsArrowLeftSquareFill size={20} />
                         <span style={{ marginLeft: '10px' }}>
                             Last Page
                         </span>
                     </Button>
-                    <Button onClick={() => props.nextPage()}>
+                    <Button onClick={() => props.nextPage()} variant="contained" style={{ marginLeft: '5px', backgroundColor: purple[400] }}>
                         <span style={{ marginRight: '10px' }}> Next Page</span>
                         <BsArrowRightSquareFill size={20} />
                     </Button>
