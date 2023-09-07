@@ -84,13 +84,26 @@ export default function showByLanguage({ params, searchParams }) {
     }
 
     const fetchFileContent = async () => {
+
+
+
         await editorRef.current.editor.setValue("Content loading...")
+
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
-        const real_res = await res.json()
-        console.log("after fetch file content.real res", real_res)
-        console.log("set content to", atob(real_res.content))
-        if (real_res.content) {
-            await editorRef.current.editor.setValue(atob(real_res.content))
+            .then(async response => {
+                const res = await response.json()
+                if (!response.ok) {
+                    throw new Error(res.message);
+                }
+                return res
+            })
+            .catch(async e => {
+                controlSnackbar(true, 'error', e.message)
+            });
+        console.log("after fetch file content.real res", res)
+        console.log("set content to", atob(res.content))
+        if (res.content) {
+            await editorRef.current.editor.setValue(atob(res.content))
         } else {
             await editorRef.current.editor.setValue("")
         }

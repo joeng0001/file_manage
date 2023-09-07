@@ -6,7 +6,7 @@ import {
   getFolder,
 } from "@/lib/database";
 import { fileAllowExtension, type2extensionDictionary } from "@/lib/constant";
-
+import { NextResponse } from "next/server";
 export const GET = async (request, { params }) => {
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.search);
@@ -30,7 +30,7 @@ export const GET = async (request, { params }) => {
       status: 200,
     });
   } catch (error) {
-    return new Response("Failed to fetch prompts created by user", {
+    return new Response(JSON.stringify({ message: error.message }), {
       status: 500,
     });
   }
@@ -78,9 +78,12 @@ export const POST = async (request, { params }) => {
     );
     return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {
-    return new Response("Failed to fetch prompts created by user", {
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify("Failed to fetch prompts created by user"),
+      {
+        status: 500,
+      }
+    );
   }
 };
 

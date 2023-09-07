@@ -40,23 +40,18 @@ export const GET = async (request) => {
     await connectToDB();
     const pathList = path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
-    console.log("get parent folder", parentFolder);
     const fileId = parentFolder.fileList.find(
       (item) => item.name === name && item.extension === extension
     )?._id;
-    console.log("get file id", fileId);
     const file = await File.findById(fileId);
-    console.log("get file", file);
     await File.findByIdAndUpdate(file._id, { lastViewAt: new Date() });
     await Folder.findByIdAndUpdate(parentFolder._id, {
       lastViewAt: new Date(),
     });
-    console.log("after update folder");
     const zipBase64String = await createZipFileFromString(
       file.base64String,
       file.name
     );
-    console.log("get zipBase64String", zipBase64String);
     return new Response(JSON.stringify(zipBase64String), {
       status: 200,
     });
