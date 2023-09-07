@@ -84,7 +84,38 @@ export const POST = async (request, { params }) => {
   }
 };
 
-export const PUT = async (request) => {};
+export const PUT = async (request) => {
+  try {
+    console.log("receive file update request");
+    const req = await request.json();
+    console.log(req);
+    const extension = type2extensionDictionary[req.type];
+    await connectToDB();
+    const pathList = req.path?.split("/");
+    const parentFolder = await getFolder(pathList, 1, pathList.length);
+    const file = parentFolder.fileList.find(
+      (file) => file.name === req.name && file.extension === extension
+    );
+    console.log("get file", file);
+    if (req.comments) {
+      await File.findByIdAndUpdate(file._id, {
+        comments: req.comments,
+        modifiedAt: new Date(),
+      });
+    } else if (req.base64String) {
+      await File.findByIdAndUpdate(file._id, {
+        base64String: req.base64String,
+        modifiedAt: new Date(),
+      });
+    }
+
+    return new Response(JSON.stringify({ data: "success" }), { status: 200 });
+  } catch (error) {
+    return new Response("Failed to update", {
+      status: 500,
+    });
+  }
+};
 
 export const DELETE = async (request) => {
   try {

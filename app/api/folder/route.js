@@ -95,6 +95,7 @@ export const POST = async (request, { params }) => {
   }
 };
 
+//update comment only
 export const PUT = async (request) => {
   try {
     const req = await request.json();

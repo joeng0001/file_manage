@@ -20,17 +20,12 @@ import 'ace-builds/src-noconflict/theme-twilight';
 
 
 export default function AceEditorCom(props) {
-    const editorRef = useRef()
-    useEffect(() => {
-        console.log(editorRef.current)
-        console.log("new content", props.content)
-        editorRef.current.editor.setValue(props.content)
-    }, [props.content])
+
     return (
         <div>
 
             <AceEditor
-                ref={editorRef}
+                ref={props.editorRef}
                 mode={`${props.type}`}
                 theme="twilight"
                 fontSize={14}

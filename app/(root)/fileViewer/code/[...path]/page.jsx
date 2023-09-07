@@ -4,18 +4,21 @@ import AceEditor from '@/components/Editor/AceEditor'
 import { motion } from "framer-motion"
 import { Cursor, useTypewriter } from 'react-simple-typewriter'
 import Decoration from '@/components/DecorationFloadtingBtn'
-import { Button, Dialog, DialogContent, DialogTitle, DialogActions } from '@mui/material'
+import { Button, Dialog, DialogContent, DialogTitle, DialogActions, TextField } from '@mui/material'
 import { cyan, pink, lightGreen, purple } from '@mui/material/colors'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Snackbar from '@/components/Snackbar'
 import ApiLoading from '@/components/ApiLoading'
+
 export default function showByLanguage({ params, searchParams }) {
     const path = params?.path.join('/')
     const name = searchParams.name
     const type = searchParams.type
+    const [commentsRef, contentsRef, editorRef] = [useRef(), useRef(), useRef()]
     const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
+    const [commentsDialog, setCommentsDialog] = useState(false)
 
-    const [content, setContent] = useState("Content Loading...")
+
 
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
@@ -81,15 +84,49 @@ export default function showByLanguage({ params, searchParams }) {
     }
 
     const fetchFileContent = async () => {
-
+        await editorRef.current.editor.setValue("Content loading...")
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
         const real_res = await res.json()
         console.log("after fetch file content.real res", real_res)
+        console.log("set content to", atob(real_res.content))
         if (real_res.content) {
-            setContent(atob(real_res.content))
+            await editorRef.current.editor.setValue(atob(real_res.content))
         } else {
-            setContent("")
+            await editorRef.current.editor.setValue("")
         }
+        await editorRef.current.editor.gotoLine(1)
+
+    }
+    const saveComments = async () => {
+        console.log("saving file comment", path, name, type, commentsRef.current.value)
+        setLoading(true)
+        await fetch('/api/file',
+            {
+                method: "PUT",
+                body: JSON.stringify({ path, name, type, comments: commentsRef.current.value })
+            }).then(res => {
+                controlSnackbar(true, "success", "comment saved")
+            }).catch(err => {
+                controlSnackbar(true, "error", "Error!" + err.message)
+            }).finally(() => {
+                setLoading(false)
+                setCommentsDialog(false)
+
+            })
+    }
+    const saveFileContent = async () => {
+        console.log("saving file content", path, name, type, editorRef.current.editor.getValue())
+        await fetch('/api/file',
+            {
+                method: "PUT",
+                body: JSON.stringify({ path, name, type, base64String: btoa(editorRef.current.editor.getValue()) })
+            }).then(res => {
+                controlSnackbar(true, "success", "content saved")
+            }).catch(err => {
+                controlSnackbar(true, "error", "Error!" + err.message)
+            }).finally(() => {
+                fetchFileContent()
+            })
 
     }
 
@@ -120,11 +157,11 @@ export default function showByLanguage({ params, searchParams }) {
             >
                 <Decoration />
                 <Button variant='contained' style={{ marginLeft: '10px', marginRight: '10px', backgroundColor: pink[700] }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
-                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: lightGreen[700] }}>Save</Button>
-                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: cyan[700] }}>Edit Comment</Button>
+                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: lightGreen[700] }} onClick={saveFileContent}>Save</Button>
+                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: cyan[700] }} onClick={() => setCommentsDialog(true)}>Edit Comment</Button>
                 <Button variant='contained' style={{ marginRight: '10px', backgroundColor: purple[700] }} onClick={getZip}>Get Zip File</Button>
             </motion.div>
-            <AceEditor content={content} type={type} loading={loading} />
+            <AceEditor type={type} loading={loading} editorRef={editorRef} />
             <Dialog
                 fullWidth={true}
                 maxWidth='sm'
@@ -151,6 +188,32 @@ export default function showByLanguage({ params, searchParams }) {
                         </div>
                 }
 
+            </Dialog>
+            <Dialog
+                fullWidth={true}
+                maxWidth='sm'
+                open={commentsDialog}
+            >
+                <DialogTitle>
+                    Edit Comment
+                </DialogTitle>
+
+                {
+                    loading ?
+                        <DialogContent>
+                            <ApiLoading />
+                        </DialogContent>
+                        :
+                        <div>
+                            <DialogContent>
+                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setCommentsDialog(false)}>Back</Button>
+                                <Button onClick={saveComments}>Save</Button>
+                            </DialogActions>
+                        </div>
+                }
             </Dialog>
             <Snackbar setSnackbarOpen={setSnackbarOpen} snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
         </div>

@@ -299,7 +299,7 @@ export default function toolbar(props) {
                         :
                         <div>
                             <DialogContent>
-                                <TextField inputRef={commentsRef} label="Comment..." variant="outlined" color="secondary" />
+                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth />
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setCommentsDialog(false)}>Back</Button>
