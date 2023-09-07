@@ -1,0 +1,45 @@
+import socket
+from time import sleep
+from threading import Thread
+import threading
+HOST = '127.0.0.1'
+PORT = 7000
+import os
+import sys
+
+
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s.bind((HOST, PORT))
+s.listen(1)
+print('server start at: %s:%s' % (HOST, PORT))
+print('wait for connection...')
+def senddata(conn):
+    while True:
+        print("inside threat")
+        while True:
+            print('receiving')
+            indata=''
+            indata = conn.recv(1024)
+            if len(indata) == 0: # connection closed
+                conn.close()
+                print('client closed connection.')
+                exit()
+            print('recv: ' + indata.decode())
+def main_represent():
+    while True:
+        num_threads = threading.active_count()
+        print(num_threads)
+        sleep(3)
+        print('this is main')   
+
+if __name__ == "__main__" :
+    new_thread = Thread(target=main_represent,args=())
+    new_thread.start()
+    while True:
+        conn, addr = s.accept()
+        print('connected by ' + str(addr))
+        new_thread = Thread(target=senddata,args=(conn,))
+        new_thread.start()
+    

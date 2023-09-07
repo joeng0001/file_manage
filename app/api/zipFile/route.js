@@ -3,32 +3,27 @@ import Folder from "@/models/folder";
 import { connectToDB, getFolder } from "@/lib/database";
 import { type2extensionDictionary } from "@/lib/constant";
 import archiver from "archiver";
-
-function createZipFileFromString(content, fileName) {
+import fs from "fs";
+function createZipFileFromString(base64String, fileName) {
   return new Promise((resolve, reject) => {
-    const buffer = Buffer.from(content);
-
-    const archive = archiver("zip", {
-      zlib: { level: 9 }, // Compression level (optional)
+    const archive = archiver("zip");
+    const buffers = [];
+    const fileBuffer = Buffer.from(base64String, "base64");
+    const tempFilePath = "tempfile.txt";
+    fs.writeFileSync(tempFilePath, fileBuffer);
+    archive.on("error", reject);
+    archive.on("data", (data) => {
+      buffers.push(data);
     });
-
-    const chunks = [];
-
-    archive.on("data", function (chunk) {
-      chunks.push(chunk);
+    archive.on("end", () => {
+      const zippedBuffer = Buffer.concat(buffers);
+      const zippedBase64String = zippedBuffer.toString("base64");
+      resolve(zippedBase64String);
     });
-
-    archive.on("error", function (err) {
-      reject(err);
+    archive.file(tempFilePath, { name: fileName });
+    archive.finalize(() => {
+      fs.unlinkSync(tempFilePath);
     });
-
-    archive.on("end", function () {
-      const resultBuffer = Buffer.concat(chunks);
-      resolve(resultBuffer);
-    });
-
-    archive.append(buffer, { name: fileName }); // Add the buffer as a file to the archive
-    archive.finalize();
   });
 }
 
@@ -56,12 +51,13 @@ export const GET = async (request) => {
     await Folder.findByIdAndUpdate(parentFolder._id, {
       lastViewAt: new Date(),
     });
-    const textString = Buffer.from(file.base64String, "base64").toString(
-      "utf-8"
+    console.log("after update folder");
+    const zipBase64String = await createZipFileFromString(
+      file.base64String,
+      file.name
     );
-    const base64String = await createZipFileFromString(textString, "test.py");
-    console.log("get base64string", base64String);
-    return new Response(JSON.stringify({ data: base64String }), {
+    console.log("get zipBase64String", zipBase64String);
+    return new Response(JSON.stringify(zipBase64String), {
       status: 200,
     });
   } catch (err) {
