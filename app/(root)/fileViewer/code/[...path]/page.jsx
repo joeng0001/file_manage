@@ -55,6 +55,12 @@ export default function showByLanguage({ params, searchParams }) {
         setSnackbarOpen(open)
     }
 
+    const getZip = async () => {
+        const res = await fetch(`/api/zipFile?path=${path}&name=${name}&type=${type}`)
+        const real_res = await res.json()
+        console.log("after get zip file", real_res)
+    }
+
     const fetchFileContent = async () => {
 
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
@@ -97,7 +103,7 @@ export default function showByLanguage({ params, searchParams }) {
                 <Button variant='contained' style={{ marginLeft: '10px', marginRight: '10px', backgroundColor: pink[700] }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
                 <Button variant='contained' style={{ marginRight: '10px', backgroundColor: lightGreen[700] }}>Save</Button>
                 <Button variant='contained' style={{ marginRight: '10px', backgroundColor: cyan[700] }}>Edit Comment</Button>
-                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: purple[700] }}>Get Zip File</Button>
+                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: purple[700] }} onClick={getZip}>Get Zip File</Button>
             </motion.div>
             <AceEditor content={content} type={type} loading={loading} />
             <Dialog

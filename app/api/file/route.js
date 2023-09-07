@@ -22,6 +22,9 @@ export const GET = async (request, { params }) => {
     )?._id;
     const file = await File.findById(fileId);
     await File.findByIdAndUpdate(file._id, { lastViewAt: new Date() });
+    await Folder.findByIdAndUpdate(parentFolder._id, {
+      lastViewAt: new Date(),
+    });
     //dont send complete file,only part of fields
     return new Response(JSON.stringify({ content: file.base64String }), {
       status: 200,
