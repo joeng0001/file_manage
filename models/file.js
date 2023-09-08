@@ -22,10 +22,6 @@ const FileSchema = new Schema({
   base64String: {
     type: String,
   },
-  encrypted: {
-    type: Boolean,
-    default: false,
-  },
   comments: {
     type: String,
     default: "",

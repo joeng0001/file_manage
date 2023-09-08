@@ -93,12 +93,13 @@ export const PUT = async (request) => {
     await connectToDB();
     const pathList = req.path?.split("/");
     const folder = await getFolder(pathList, 1, pathList.length);
-
-    await Folder.findByIdAndUpdate(folder._id, {
-      comment: req.comment,
-      modifiedAt: new Date(),
-      lastViewAt: new Date(),
-    });
+    if (req.comment) {
+      await Folder.findByIdAndUpdate(folder._id, {
+        comment: req.comment,
+        modifiedAt: new Date(),
+        lastViewAt: new Date(),
+      });
+    }
 
     return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {
