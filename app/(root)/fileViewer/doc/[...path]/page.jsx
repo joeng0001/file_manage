@@ -1,6 +1,5 @@
 "use client"
-
-import AceEditor from '@/components/Editor/AceEditor'
+import QuillEditor from "@/components/Editor/QuillEditor"
 import { motion } from "framer-motion"
 import { Cursor, useTypewriter } from 'react-simple-typewriter'
 import Decoration from '@/components/DecorationFloadtingBtn'
@@ -9,15 +8,16 @@ import { cyan, pink, lightGreen, purple } from '@mui/material/colors'
 import { useEffect, useState, useRef } from 'react'
 import Snackbar from '@/components/Snackbar'
 import ApiLoading from '@/components/ApiLoading'
+    ;
 
 export default function showByLanguage({ params, searchParams }) {
     const path = params?.path.join('/')
     const name = searchParams.name
     const type = searchParams.type
-    const [commentsRef, editorRef] = [useRef(), useRef()]
+    const [commentsRef] = [useRef()]
     const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
     const [commentsDialog, setCommentsDialog] = useState(false)
-
+    const [editorContent, setEditorContent] = useState("")
 
 
     const [snackbarOpen, setSnackbarOpen] = useState(false)
@@ -43,7 +43,7 @@ export default function showByLanguage({ params, searchParams }) {
                 method: "DELETE",
                 body: JSON.stringify({ path: path, name: name })
             }).then(res => {
-                controlSnackbar(true, "success", "file deleted")
+                controlSnackbar(true, "success", "folder deleted")
                 fetchFileContent()
             }).catch(err => {
                 controlSnackbar(true, "error", "Error!" + err.message)
@@ -60,8 +60,6 @@ export default function showByLanguage({ params, searchParams }) {
 
     const getZip = async () => {
         try {
-
-
             const res = await fetch(`/api/zipFile?path=${path}&name=${name}&type=${type}`)
             const real_res = await res.json()
             const byteCharacters = atob(real_res);
@@ -87,15 +85,35 @@ export default function showByLanguage({ params, searchParams }) {
         } catch (e) {
             controlSnackbar(true, 'error', e.message)
         }
-
     }
+    const convertBase64ToHTML = (base64String) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
 
+            reader.onload = () => {
+                const arrayBuffer = reader.result;
+                mammoth.extractRawText({ arrayBuffer: arrayBuffer })
+                    .then((result) => {
+                        resolve(result.value);
+                    })
+                    .catch((error) => {
+                        reject(error);
+                    });
+            };
+
+            const bytes = atob(base64String.split(',')[1]);
+            const byteLength = bytes.length;
+            const byteArray = new Uint8Array(byteLength);
+
+            for (let i = 0; i < byteLength; i++) {
+                byteArray[i] = bytes.charCodeAt(i);
+            }
+
+            const blob = new Blob([byteArray], { type: 'application/octet-stream' });
+            reader.readAsArrayBuffer(blob);
+        });
+    };
     const fetchFileContent = async () => {
-
-
-
-        await editorRef.current.editor.setValue("Content loading...")
-
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
@@ -104,15 +122,13 @@ export default function showByLanguage({ params, searchParams }) {
                 }
                 return res
             })
+            .then(async res => {
+                console.log(atob(res.content))
+                setEditorContent(atob(res.content))
+            })
             .catch(e => {
                 controlSnackbar(true, 'error', e.message)
             });
-        if (res.content) {
-            await editorRef.current.editor.setValue(atob(res.content))
-        } else {
-            await editorRef.current.editor.setValue("")
-        }
-        await editorRef.current.editor.gotoLine(1)
 
     }
     const saveComments = async () => {
@@ -179,7 +195,7 @@ export default function showByLanguage({ params, searchParams }) {
                 <Button variant='contained' style={{ marginRight: '10px', backgroundColor: cyan[700] }} onClick={() => setCommentsDialog(true)}>Edit Comment</Button>
                 <Button variant='contained' style={{ marginRight: '10px', backgroundColor: purple[700] }} onClick={getZip}>Get Zip File</Button>
             </motion.div>
-            <AceEditor type={type} loading={loading} editorRef={editorRef} />
+            <QuillEditor loading={loading} editorContent={editorContent} setEditorContent={setEditorContent} />
             <Dialog
                 fullWidth={true}
                 maxWidth='sm'

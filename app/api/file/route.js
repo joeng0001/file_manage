@@ -6,7 +6,20 @@ import {
   getFolder,
 } from "@/lib/database";
 import { fileAllowExtension, type2extensionDictionary } from "@/lib/constant";
+import mammoth from "mammoth";
+const WordToHTML = async (base64String) => {
+  const buffer = Buffer.from(base64String, "base64");
+  const result = await mammoth.convertToHtml({ buffer: buffer });
+  const base64Html = Buffer.from(result.value).toString("base64");
+  return base64Html;
+};
 
+const HTMLToWord = async (base64String) => {
+  const buffer = Buffer.from(data.base64String, "base64");
+  const result = await mammoth.extractRawText({ buffer: buffer });
+  const base64Doc = Buffer.from(result.value).toString("base64");
+  return base64Doc;
+};
 export const GET = async (request, { params }) => {
   try {
     const url = new URL(request.url);
@@ -30,6 +43,9 @@ export const GET = async (request, { params }) => {
     await Folder.findByIdAndUpdate(parentFolder._id, {
       lastViewAt: new Date(),
     });
+    if (extension === ".docx" || extension === ".doc") {
+      file.base64String = await WordToHTML(file.base64String);
+    }
     return new Response(
       JSON.stringify({ content: file.base64String, comments: file.comments }),
       {
@@ -71,6 +87,9 @@ export const POST = async (request, { params }) => {
       base64String: req.base64String ?? null,
       path: req.path,
     });
+    if (req.entension === ".doc" || req.extension === ".docx") {
+      file.base64String = await HTMLToWord(file.base64String);
+    }
     const new_file = await file.save();
     parentFolder.fileList.push({
       _id: new_file._id,
