@@ -14,7 +14,7 @@ export default function Home() {
         {homeList.map(item => {
           return (
             <Grid item xs={4}>
-              <Link href={item.href} className="disableLinkStyle">
+              <Link href={item.href} className="disableLinkStyle" prefetch >
                 <Box className="Box">
                   {item.icon}
                   <div style={{ marginTop: '10px' }}>{item.title}</div>

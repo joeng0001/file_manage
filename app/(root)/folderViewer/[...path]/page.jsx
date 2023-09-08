@@ -61,7 +61,7 @@ export default function fileList({ params, searchParams }) {
                                 {
                                     folderList?.map(folder => (
                                         <Grid item xs={4} key={folder.name}>
-                                            <Link href={`/folderViewer/${folder.path}/${folder.name}/?page=1`} className="disableLinkStyle">
+                                            <Link href={`/folderViewer/${folder.path}/${folder.name}/?page=1`} className="disableLinkStyle" >
                                                 <Box className="Box">
                                                     <FcOpenedFolder size={40} />
                                                     <div style={{ marginTop: '10px' }}>{folder.name}</div>
@@ -74,7 +74,7 @@ export default function fileList({ params, searchParams }) {
                                 {
                                     fileList?.map(file => (
                                         <Grid item xs={4} key={file.name}>
-                                            <Link href={`/fileViewer/${file.viewType}/${file.path}?name=${file.name}&type=${file.type}`} className="disableLinkStyle">
+                                            <Link href={`/fileViewer/${file.viewType}/${file.path}?name=${file.name}&type=${file.type}`} className="disableLinkStyle" >
                                                 <Box className="Box">
                                                     <FcFile size={40} />
                                                     <div style={{ marginTop: '10px' }}>{file.name}</div>

@@ -28,13 +28,15 @@ function createZipFileFromString(base64String, fileName) {
 }
 
 export const GET = async (request) => {
-  const url = new URL(request.url);
-  const searchParams = new URLSearchParams(url.search);
-  const path = searchParams.get("path");
-  const name = searchParams.get("name");
-  const extension = type2extensionDictionary[searchParams.get("type")];
-
   try {
+    const url = new URL(request.url);
+    const searchParams = new URLSearchParams(url.search);
+    const path = searchParams.get("path");
+    const name = searchParams.get("name");
+    const extension = type2extensionDictionary[searchParams.get("type")];
+    if (!path || !name || !extension) {
+      throw new Error("missing required params");
+    }
     await connectToDB();
     const pathList = path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);

@@ -3,7 +3,6 @@ import Folder from "@/models/folder";
 import { connectToDB } from "@/lib/database";
 import { extension2typeDictionary, extension2viewType } from "@/lib/constant";
 export const GET = async (request, { params }) => {
-  console.log("receive get filelist request");
   try {
     await connectToDB();
     const folders = await Folder.find().sort({ lastViewAt: -1 }).limit(3);

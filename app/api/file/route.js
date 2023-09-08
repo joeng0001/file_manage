@@ -8,12 +8,15 @@ import {
 import { fileAllowExtension, type2extensionDictionary } from "@/lib/constant";
 
 export const GET = async (request, { params }) => {
-  const url = new URL(request.url);
-  const searchParams = new URLSearchParams(url.search);
-  const path = searchParams.get("path");
-  const name = searchParams.get("name");
-  const extension = type2extensionDictionary[searchParams.get("type")];
   try {
+    const url = new URL(request.url);
+    const searchParams = new URLSearchParams(url.search);
+    const path = searchParams.get("path");
+    const name = searchParams.get("name");
+    const extension = type2extensionDictionary[searchParams.get("type")];
+    if (!path || !name || !extension) {
+      throw new Error("missing required params");
+    }
     await connectToDB();
     const pathList = path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
@@ -42,6 +45,9 @@ export const POST = async (request, { params }) => {
   try {
     if (!fileAllowExtension.includes(req.extension)) {
       throw new Error("file type not allowed");
+    }
+    if (!req.path || !req.name || !req.extension || !req.base64String) {
+      throw new Error("missing required params");
     }
     await connectToDB();
     const pathList = req.path?.split("/");
@@ -84,6 +90,14 @@ export const POST = async (request, { params }) => {
 export const PUT = async (request) => {
   try {
     const req = await request.json();
+    if (
+      !req.type ||
+      !req.path ||
+      !req.name ||
+      !(req.comments || req.base64String)
+    ) {
+      throw new Error("missing required params");
+    }
     const extension = type2extensionDictionary[req.type];
     await connectToDB();
     const pathList = req.path?.split("/");
@@ -118,6 +132,9 @@ export const PUT = async (request) => {
 export const DELETE = async (request) => {
   try {
     const req = await request.json();
+    if (!req.path || !req.name) {
+      throw new Error("missing required params");
+    }
     await connectToDB();
     const pathList = req.path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);

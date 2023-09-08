@@ -9,17 +9,17 @@ import { auth } from "@clerk/nextjs";
 import { extension2typeDictionary, extension2viewType } from "@/lib/constant";
 
 export const GET = async (request, { params }) => {
-  //console.log("receive get request of folder", request.url);
-  //const a = auth();
-  //console.log(a);
-  // if (!userId) throw new Error("not authorized");
-  const url = new URL(request.url);
-  const searchParams = new URLSearchParams(url.search);
-  const path = searchParams.get("path");
-  const page = searchParams.get("page");
   try {
+    const url = new URL(request.url);
+    const searchParams = new URLSearchParams(url.search);
+    const path = searchParams.get("path");
+    const page = searchParams.get("page");
+    if (!path || !page) {
+      throw new Error("missing required params");
+    }
     await connectToDB();
     const pathList = path?.split("/");
+    await createRootFolderIfNotExist(pathList[0]);
     const folder = await getFolder(pathList, 1, pathList.length);
     await Folder.findByIdAndUpdate(folder._id, { lastViewAt: new Date() });
     const fileList =
@@ -53,6 +53,9 @@ export const GET = async (request, { params }) => {
 export const POST = async (request, { params }) => {
   try {
     const req = await request.json();
+    if (!req.path || !req.name) {
+      throw new Error("missing required params");
+    }
     await connectToDB();
     const pathList = req.path?.split("/");
     await createRootFolderIfNotExist(pathList[0]);
@@ -90,6 +93,9 @@ export const POST = async (request, { params }) => {
 export const PUT = async (request) => {
   try {
     const req = await request.json();
+    if (!req.path) {
+      throw new Error("missing required params");
+    }
     await connectToDB();
     const pathList = req.path?.split("/");
     const folder = await getFolder(pathList, 1, pathList.length);
@@ -131,6 +137,9 @@ const dfsDelete = async (currentFolderObj) => {
 export const DELETE = async (request) => {
   try {
     const req = await request.json();
+    if (!req.path) {
+      throw new Error("missing required params");
+    }
     await connectToDB();
     const pathList = req.path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length - 1);
