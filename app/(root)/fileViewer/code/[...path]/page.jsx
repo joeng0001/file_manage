@@ -59,28 +59,35 @@ export default function showByLanguage({ params, searchParams }) {
     }
 
     const getZip = async () => {
-        const res = await fetch(`/api/zipFile?path=${path}&name=${name}&type=${type}`)
-        const real_res = await res.json()
-        const byteCharacters = atob(real_res);
-        const byteArrays = [];
-        for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-            const slice = byteCharacters.slice(offset, offset + 1024);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
+        try {
+
+
+            const res = await fetch(`/api/zipFile?path=${path}&name=${name}&type=${type}`)
+            const real_res = await res.json()
+            const byteCharacters = atob(real_res);
+            const byteArrays = [];
+            for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+                const slice = byteCharacters.slice(offset, offset + 1024);
+                const byteNumbers = new Array(slice.length);
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
             }
-            const byteArray = new Uint8Array(byteNumbers);
-            byteArrays.push(byteArray);
+            const blob = new Blob(byteArrays, { type: 'application/zip' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'achiver.zip';
+            document.body.appendChild(link);
+            link.click();
+            URL.revokeObjectURL(url);
+            document.body.removeChild(link);
+        } catch (e) {
+            controlSnackbar(true, 'error', e.message)
         }
-        const blob = new Blob(byteArrays, { type: 'application/zip' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'achiver.zip';
-        document.body.appendChild(link);
-        link.click();
-        URL.revokeObjectURL(url);
-        document.body.removeChild(link);
+
     }
 
     const fetchFileContent = async () => {
@@ -97,11 +104,9 @@ export default function showByLanguage({ params, searchParams }) {
                 }
                 return res
             })
-            .catch(async e => {
+            .catch(e => {
                 controlSnackbar(true, 'error', e.message)
             });
-        console.log("after fetch file content.real res", res)
-        console.log("set content to", atob(res.content))
         if (res.content) {
             await editorRef.current.editor.setValue(atob(res.content))
         } else {

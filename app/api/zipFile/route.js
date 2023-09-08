@@ -28,13 +28,11 @@ function createZipFileFromString(base64String, fileName) {
 }
 
 export const GET = async (request) => {
-  console.log("receive get zip file request");
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.search);
   const path = searchParams.get("path");
   const name = searchParams.get("name");
   const extension = type2extensionDictionary[searchParams.get("type")];
-  console.log("get path name extension", path, name, extension);
 
   try {
     await connectToDB();
@@ -55,9 +53,9 @@ export const GET = async (request) => {
     return new Response(JSON.stringify(zipBase64String), {
       status: 200,
     });
-  } catch (err) {
-    return new Response("Failed to get zip file", {
-      status: 500,
+  } catch (error) {
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: error.code || 500,
     });
   }
 };

@@ -3,13 +3,10 @@ import Folder from "@/models/folder";
 import { connectToDB } from "@/lib/database";
 import { extension2viewType, extension2typeDictionary } from "@/lib/constant";
 export const GET = async (request, { params }) => {
-  console.log("receive get filelist request");
   try {
     await connectToDB();
     const folders = await Folder.find();
-    //console.log("get folders", folders);
     const files = await File.find();
-    //console.log("get files", files);
     const res = {
       folders: folders.map((folder) => {
         return {
@@ -32,8 +29,8 @@ export const GET = async (request, { params }) => {
       status: 200,
     });
   } catch (error) {
-    return new Response("Failed to fetch prompts created by user", {
-      status: 500,
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: error.code || 500,
     });
   }
 };

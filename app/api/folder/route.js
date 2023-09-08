@@ -17,16 +17,11 @@ export const GET = async (request, { params }) => {
   const searchParams = new URLSearchParams(url.search);
   const path = searchParams.get("path");
   const page = searchParams.get("page");
-  console.log(page);
   try {
     await connectToDB();
     const pathList = path?.split("/");
-    //console.log(pathList);
-    //console.log("receive path");
     const folder = await getFolder(pathList, 1, pathList.length);
-    //console.log("send back folder", folder);
     await Folder.findByIdAndUpdate(folder._id, { lastViewAt: new Date() });
-
     const fileList =
       folder?.fileList?.map((file) => {
         return {
@@ -49,8 +44,8 @@ export const GET = async (request, { params }) => {
       { status: 200 }
     );
   } catch (error) {
-    return new Response(JSON.stringify("Failed to fetch "), {
-      status: 500,
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: error.code || 500,
     });
   }
 };
@@ -63,7 +58,6 @@ export const POST = async (request, { params }) => {
     await createRootFolderIfNotExist(pathList[0]);
     const parentFolder = await getFolder(pathList, 1, pathList.length);
     if (parentFolder.folderList.find((folder) => folder.name === req.name)) {
-      console.log("folder existed");
       throw new Error("folder already exist");
     }
     const folder = new Folder({
@@ -81,16 +75,13 @@ export const POST = async (request, { params }) => {
       name: new_folder.name,
       path: new_folder.path,
       modifiedAt: new Date(),
+      lastViewAt: new Date(),
     });
-    const new_parent_folder = await Folder.findByIdAndUpdate(
-      parentFolder._id,
-      parentFolder,
-      { new: true }
-    );
+    await Folder.findByIdAndUpdate(parentFolder._id, parentFolder);
     return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {
-    return new Response("Failed to fetch prompts created by user", {
-      status: 500,
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: error.code || 500,
     });
   }
 };
@@ -103,34 +94,30 @@ export const PUT = async (request) => {
     const pathList = req.path?.split("/");
     const folder = await getFolder(pathList, 1, pathList.length);
 
-    await Folder.findByIdAndUpdate(
-      folder._id,
-      { comment: req.comment, modifiedAt: new Date() },
-      { new: true }
-    );
+    await Folder.findByIdAndUpdate(folder._id, {
+      comment: req.comment,
+      modifiedAt: new Date(),
+      lastViewAt: new Date(),
+    });
 
     return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {
-    return new Response("Failed to fetch prompts created by user", {
-      status: 500,
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: error.code || 500,
     });
   }
 };
 
 const dfsDelete = async (currentFolderObj) => {
   if (!currentFolderObj) return;
-  console.log("start delete");
   const currentfolder = await Folder.findOne({
     _id: currentFolderObj._id,
   });
-  console.log("get current folder", currentfolder);
   const deleteFiles = currentfolder?.fileList?.map(async (file) => {
-    console.log("delete file", file);
     await File.deleteOne({ _id: file._id });
   });
   const deleteFolders = currentfolder?.folderList?.map(async (folder) => {
     await dfsDelete(folder);
-    console.log("delete folder", folder);
     await Folder.deleteOne({ _id: folder._id });
   });
   const deleteCurrentFolder = await Folder.deleteOne({
@@ -153,7 +140,6 @@ export const DELETE = async (request) => {
         : parentFolder.folderList.find(
             (folder) => folder.name === currentFolderName
           );
-    console.log("current folder", currentFolder);
     await dfsDelete(currentFolder);
 
     if (parentFolder._id !== currentFolder._id) {
@@ -164,12 +150,15 @@ export const DELETE = async (request) => {
             (folder) => folder.name !== currentFolder.name
           ),
           modifiedAt: new Date(),
+          lastViewAt: new Date(),
         },
         { new: true }
       );
     }
     return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {
-    console.error(error);
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: error.code || 500,
+    });
   }
 };

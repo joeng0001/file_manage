@@ -26,8 +26,8 @@ export const GET = async (request, { params }) => {
     };
     return new Response(JSON.stringify(res), { status: 200 });
   } catch (error) {
-    return new Response("Failed to fetch prompts created by user", {
-      status: 500,
+    return new Response(JSON.stringify({ message: error.message }), {
+      status: error.code || 500,
     });
   }
 };

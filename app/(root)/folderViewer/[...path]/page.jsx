@@ -21,8 +21,6 @@ export default function fileList({ params, searchParams }) {
 
     const pathsList = params?.path
     const page = searchParams?.page
-    //console.log(params,searchParams)
-    //console.log(item)
 
     const nextPage = () => {
         router.push(`/folderViewer/${pathsList.join('/')}?page=${page * 1 + 1}`)
@@ -43,7 +41,6 @@ export default function fileList({ params, searchParams }) {
         setLoading(true)
         const res = await fetch(`/api/folder?path=${pathsList.join('/')}&page=${page}`)
         const real_res = await res.json()
-        console.log(real_res)
         setFileList(() => real_res?.list?.filter(item => !item.isFolder) ?? [])
         setFolderList(() => real_res?.list?.filter(item => item.isFolder) ?? [])
         setLoading(false)
