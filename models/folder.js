@@ -34,7 +34,7 @@ const FolderSchema = new Schema({
     type: Array,
     default: [],
   },
-  comment: {
+  comments: {
     type: String,
   },
   remarks: {

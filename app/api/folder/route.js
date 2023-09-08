@@ -40,6 +40,7 @@ export const GET = async (request, { params }) => {
     return new Response(
       JSON.stringify({
         list,
+        comments: folder.comments,
       }),
       { status: 200 }
     );
@@ -99,9 +100,9 @@ export const PUT = async (request) => {
     await connectToDB();
     const pathList = req.path?.split("/");
     const folder = await getFolder(pathList, 1, pathList.length);
-    if (req.comment) {
+    if (req.comments) {
       await Folder.findByIdAndUpdate(folder._id, {
-        comment: req.comment,
+        comments: req.comments,
         modifiedAt: new Date(),
         lastViewAt: new Date(),
       });

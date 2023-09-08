@@ -1,17 +1,20 @@
 "use client"
 
-import { Button } from "@mui/material";
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, } from "@mui/material";
 import { useState, useEffect, useRef } from "react";
 import Snackbar from '@/components/Snackbar'
-
+import ApiLoading from "@/components/ApiLoading"
+import { lightGreen } from '@mui/material/colors'
+import { MdComment } from "react-icons/md";
 export default function PDFEditor({ params, searchParams }) {
 
     const path = params?.path.join('/')
     const name = searchParams.name
     const type = searchParams.type
     const [url, setURL] = useState('')
-    const inputRef = useRef()
-
+    const [inputRef, commentsRef] = [useRef(), useRef()]
+    const [comments, setComments] = useState("")
+    const [commentsDialog, setCommentsDialog] = useState(false)
     const [loading, setLoading] = useState(false)
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
@@ -67,7 +70,6 @@ export default function PDFEditor({ params, searchParams }) {
             reader.readAsDataURL(e.target.files[0]);
             reader.onload = async () => {
                 let base64String = reader.result.split(',')[1];
-                setLoading(true)
                 await fetch('/api/file',
                     {
                         method: "PUT",
@@ -82,8 +84,6 @@ export default function PDFEditor({ params, searchParams }) {
                         fetchFileContent()
                     }).catch(err => {
                         controlSnackbar(true, "error", "Error!" + err.message)
-                    }).finally(() => {
-                        setLoading(false)
                     })
             }
         }
@@ -101,6 +101,7 @@ export default function PDFEditor({ params, searchParams }) {
             })
             .then(res => {
                 console.log("get return res", res)
+                setComments(res.comments)
                 const byteCharacters = atob(res.content);
                 const byteNumbers = new Array(byteCharacters.length);
                 for (let i = 0; i < byteCharacters.length; i++) {
@@ -114,10 +115,49 @@ export default function PDFEditor({ params, searchParams }) {
                 controlSnackbar(true, 'error', e.message)
             });
     }
+    const saveComments = async () => {
+        setLoading(true)
+        await fetch('/api/file',
+            {
+                method: "PUT",
+                body: JSON.stringify({
+                    name,
+                    type,
+                    path,
+                    comments: commentsRef.current.value
+                })
+            }).then(res => {
+                controlSnackbar(true, "success", "comment saved")
+            }).catch(err => {
+                controlSnackbar(true, "error", "Error!" + err.message)
+            }).finally(() => {
+                setCommentsDialog(false)
+                setLoading(false)
+                fetchComments()
+            })
+    }
 
+    const fetchComments = async () => {
+        const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
+            .then(async response => {
+                const res = await response.json()
+                if (!response.ok) {
+                    throw new Error(res.message);
+                }
+                console.log("get res", res)
+                return res
+            })
+            .then(res => {
+                setComments(res.comments)
+            })
+            .catch(e => {
+                controlSnackbar(true, 'error', e.message)
+            });
+    }
 
     useEffect(() => {
         fetchFileContent()
+        fetchComments()
     }, [])
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -134,10 +174,36 @@ export default function PDFEditor({ params, searchParams }) {
                         className="HidedButton" />
                 </Button>
                 it back for editing</div>
-            <div>Comment dialog TO BE DONE</div>
-            <embed id="embed" src={url} type="application/pdf" width="90%" style={{ height: '85vh' }} ></embed>
+            <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: lightGreen[400] }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
+            <embed id="embed" src={url} type="application/pdf" width="90%" style={{ height: '70vh' }} ></embed>
 
             <Snackbar setSnackbarOpen={setSnackbarOpen} snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
+            <Dialog
+                fullWidth={true}
+                maxWidth='sm'
+                open={commentsDialog}
+            >
+                <DialogTitle>
+                    Edit Comment
+                </DialogTitle>
+
+                {
+                    loading ?
+                        <DialogContent>
+                            <ApiLoading />
+                        </DialogContent>
+                        :
+                        <div>
+                            <DialogContent>
+                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth defaultValue={comments} />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setCommentsDialog(false)}>Back</Button>
+                                <Button onClick={saveComments}>Save</Button>
+                            </DialogActions>
+                        </div>
+                }
+            </Dialog>
         </div>
     );
 }

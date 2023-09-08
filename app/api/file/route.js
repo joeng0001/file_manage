@@ -30,9 +30,12 @@ export const GET = async (request, { params }) => {
     await Folder.findByIdAndUpdate(parentFolder._id, {
       lastViewAt: new Date(),
     });
-    return new Response(JSON.stringify({ content: file.base64String }), {
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({ content: file.base64String, comments: file.comments }),
+      {
+        status: 200,
+      }
+    );
   } catch (error) {
     return new Response(JSON.stringify({ message: error.message }), {
       status: error.code || 500,

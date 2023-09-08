@@ -14,7 +14,6 @@ export default function toolbar(props) {
     const [confirmUploadDialog, setConfirmUploadDialog] = useState(false)
     const [commentsDialog, setCommentsDialog] = useState(false)
     const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
-
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState({})
     let fileExtension = fileTypeOption[0].extension
@@ -108,10 +107,10 @@ export default function toolbar(props) {
         await fetch('/api/folder',
             {
                 method: "PUT",
-                body: JSON.stringify({ comment: commentsRef.current.value, path: props.path })
+                body: JSON.stringify({ comments: commentsRef.current.value, path: props.path })
             }).then(res => {
                 props.controlSnackbar(true, "success", "Comment Saved")
-                props.fetchData()
+                props.fetchComments()
             }).catch(err => {
                 props.controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
@@ -300,7 +299,7 @@ export default function toolbar(props) {
                         :
                         <div>
                             <DialogContent>
-                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth />
+                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth defaultValue={props.comments} />
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setCommentsDialog(false)}>Back</Button>
