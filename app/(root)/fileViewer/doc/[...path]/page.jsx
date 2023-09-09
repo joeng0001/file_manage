@@ -1,16 +1,23 @@
 "use client"
 import QuillEditor from "@/components/Editor/QuillEditor"
 import { motion } from "framer-motion"
-import { Cursor, useTypewriter } from 'react-simple-typewriter'
+import Banner from "@/components/Banner"
 import Decoration from '@/components/DecorationFloadtingBtn'
 import { Button, Dialog, DialogContent, DialogTitle, DialogActions, TextField } from '@mui/material'
 import { cyan, pink, lightGreen, purple } from '@mui/material/colors'
 import { useEffect, useState, useRef } from 'react'
 import Snackbar from '@/components/Snackbar'
 import ApiLoading from '@/components/ApiLoading'
-    ;
+
 
 export default function showByLanguage({ params, searchParams }) {
+    console.log("render doc page view")
+
+
+    const words = [
+        "Welcome!",
+        "Edit your doc/docx file here!"
+    ]
     const path = params?.path.join('/')
     const name = searchParams.name
     const type = searchParams.type
@@ -24,15 +31,6 @@ export default function showByLanguage({ params, searchParams }) {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
     const [snackbarMessage, setSnackbarMessage] = useState("")
     const [loading, setLoading] = useState(false)
-
-    const [text, count] = useTypewriter({
-        words: [
-            "Edit your code file here",
-            "Welcome!"
-        ],
-        loop: true,
-        delaySpeed: 2000
-    })
 
     //use put to update tfile
 
@@ -86,34 +84,9 @@ export default function showByLanguage({ params, searchParams }) {
             controlSnackbar(true, 'error', e.message)
         }
     }
-    const convertBase64ToHTML = (base64String) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
 
-            reader.onload = () => {
-                const arrayBuffer = reader.result;
-                mammoth.extractRawText({ arrayBuffer: arrayBuffer })
-                    .then((result) => {
-                        resolve(result.value);
-                    })
-                    .catch((error) => {
-                        reject(error);
-                    });
-            };
-
-            const bytes = atob(base64String.split(',')[1]);
-            const byteLength = bytes.length;
-            const byteArray = new Uint8Array(byteLength);
-
-            for (let i = 0; i < byteLength; i++) {
-                byteArray[i] = bytes.charCodeAt(i);
-            }
-
-            const blob = new Blob([byteArray], { type: 'application/octet-stream' });
-            reader.readAsArrayBuffer(blob);
-        });
-    };
     const fetchFileContent = async () => {
+        console.log("fetching content")
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
@@ -123,7 +96,7 @@ export default function showByLanguage({ params, searchParams }) {
                 return res
             })
             .then(async res => {
-                console.log(atob(res.content))
+                console.log("setting editor content", atob(res.content))
                 setEditorContent(atob(res.content))
             })
             .catch(e => {
@@ -149,19 +122,24 @@ export default function showByLanguage({ params, searchParams }) {
             })
     }
     const saveFileContent = async () => {
-        console.log("saving file content", path, name, type, editorRef.current.editor.getValue())
+        console.log(editorContent)
+        console.log(btoa(editorContent))
         await fetch('/api/file',
             {
                 method: "PUT",
-                body: JSON.stringify({ path, name, type, base64String: btoa(editorRef.current.editor.getValue()) })
-            }).then(res => {
+                body: JSON.stringify({ path, name, type, base64String: btoa(editorContent) })
+            }).then(async (response) => {
+                const res = await response.json()
+                if (!response.ok) {
+                    throw new Error(res.message);
+                }
                 controlSnackbar(true, "success", "content saved")
+                return res
             }).catch(err => {
                 controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
-                fetchFileContent()
+                //fetchFileContent()
             })
-
     }
 
     useEffect(() => {
@@ -170,11 +148,7 @@ export default function showByLanguage({ params, searchParams }) {
 
     return (
         <div>
-            <h1>
-                <span>{text}</span>
-                <Cursor cursorColor="#000000" />
-            </h1>
-
+            <Banner words={words} />
             <motion.div
                 initial={{
                     x: 2000
@@ -191,11 +165,11 @@ export default function showByLanguage({ params, searchParams }) {
             >
                 <Decoration />
                 <Button variant='contained' style={{ marginLeft: '10px', marginRight: '10px', backgroundColor: pink[700] }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
-                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: lightGreen[700] }} onClick={saveFileContent}>Save</Button>
+                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: lightGreen[700] }} onClick={() => saveFileContent()}>Save</Button>
                 <Button variant='contained' style={{ marginRight: '10px', backgroundColor: cyan[700] }} onClick={() => setCommentsDialog(true)}>Edit Comment</Button>
-                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: purple[700] }} onClick={getZip}>Get Zip File</Button>
+                <Button variant='contained' style={{ marginRight: '10px', backgroundColor: purple[700] }} onClick={() => getZip()}>Get Zip File</Button>
             </motion.div>
-            <QuillEditor loading={loading} editorContent={editorContent} setEditorContent={setEditorContent} />
+            <QuillEditor editorContent={editorContent} setEditorContent={setEditorContent} />
             <Dialog
                 fullWidth={true}
                 maxWidth='sm'
@@ -217,7 +191,7 @@ export default function showByLanguage({ params, searchParams }) {
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setConfirmDeleteDialog(false)}>Cancel</Button>
-                                <Button onClick={confirmDeleteFile}>Confirm</Button>
+                                <Button onClick={() => confirmDeleteFile()}>Confirm</Button>
                             </DialogActions>
                         </div>
                 }
@@ -244,12 +218,12 @@ export default function showByLanguage({ params, searchParams }) {
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setCommentsDialog(false)}>Back</Button>
-                                <Button onClick={saveComments}>Save</Button>
+                                <Button onClick={() => saveComments()}>Save</Button>
                             </DialogActions>
                         </div>
                 }
             </Dialog>
-            <Snackbar setSnackbarOpen={setSnackbarOpen} snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
+            <Snackbar setSnackbarOpen={(v) => setSnackbarOpen(v)} snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
         </div>
     )
 }

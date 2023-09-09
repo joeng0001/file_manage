@@ -133,7 +133,7 @@ export default function header() {
                             size="small"
                             renderInput={params => <TextField  {...params} placeholder="Search" />}
                             className="Search_TextField"
-                            onOpen={initOptionsList}
+                            onOpen={() => initOptionsList()}
                             noOptionsText={loadingSearchList ? "Loading..." : "no options available"}
                             onChange={(e, option) => router.push(
                                 option.label === 'folder' ?

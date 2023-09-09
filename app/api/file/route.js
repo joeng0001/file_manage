@@ -7,6 +7,7 @@ import {
 } from "@/lib/database";
 import { fileAllowExtension, type2extensionDictionary } from "@/lib/constant";
 import mammoth from "mammoth";
+import HTMLtoDOCX from "html-to-docx";
 const WordToHTML = async (base64String) => {
   const buffer = Buffer.from(base64String, "base64");
   const result = await mammoth.convertToHtml({ buffer: buffer });
@@ -15,10 +16,13 @@ const WordToHTML = async (base64String) => {
 };
 
 const HTMLToWord = async (base64String) => {
-  const buffer = Buffer.from(data.base64String, "base64");
-  const result = await mammoth.extractRawText({ buffer: buffer });
-  const base64Doc = Buffer.from(result.value).toString("base64");
-  return base64Doc;
+  const htmlContent = Buffer.from(base64String, "base64").toString("utf-8");
+  const stringText = htmlContent.toString("utf-8");
+  console.log(stringText);
+  const fileBuffer = await HTMLtoDOCX(stringText);
+
+  const outputBase64String = fileBuffer.toString("base64");
+  return outputBase64String;
 };
 export const GET = async (request, { params }) => {
   try {
@@ -87,9 +91,6 @@ export const POST = async (request, { params }) => {
       base64String: req.base64String ?? null,
       path: req.path,
     });
-    if (req.entension === ".doc" || req.extension === ".docx") {
-      file.base64String = await HTMLToWord(file.base64String);
-    }
     const new_file = await file.save();
     parentFolder.fileList.push({
       _id: new_file._id,
@@ -111,6 +112,7 @@ export const POST = async (request, { params }) => {
 
 export const PUT = async (request) => {
   try {
+    console.log("receive save file request");
     const req = await request.json();
     if (
       !req.type ||
@@ -121,12 +123,14 @@ export const PUT = async (request) => {
       throw new Error("missing required params");
     }
     const extension = type2extensionDictionary[req.type];
+    console.log("get extension", extension);
     await connectToDB();
     const pathList = req.path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
     const file = parentFolder.fileList.find(
       (file) => file.name === req.name && file.extension === extension
     );
+    console.log("get file", file);
     if (!file) {
       throw new Error("file not exist");
     }
@@ -137,11 +141,22 @@ export const PUT = async (request) => {
         lastViewAt: new Date(),
       });
     } else if (req.base64String) {
-      await File.findByIdAndUpdate(file._id, {
+      console.log("receive file base64String", req.base64String);
+
+      const newFile = {
         base64String: req.base64String,
         modifiedAt: new Date(),
         lastViewAt: new Date(),
+      };
+      if (extension === ".doc" || extension === ".docx") {
+        console.log("before converting");
+        newFile.base64String = await HTMLToWord(req.base64String);
+        console.log("after converting");
+      }
+      const newFile1 = await File.findByIdAndUpdate(file._id, newFile, {
+        new: true,
       });
+      console.log("save new file", newFile1);
     }
     return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {

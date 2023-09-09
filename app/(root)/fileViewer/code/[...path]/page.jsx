@@ -2,7 +2,7 @@
 
 import AceEditor from '@/components/Editor/AceEditor'
 import { motion } from "framer-motion"
-import { Cursor, useTypewriter } from 'react-simple-typewriter'
+import Banner from "@/components/Banner"
 import Decoration from '@/components/DecorationFloadtingBtn'
 import { Button, Dialog, DialogContent, DialogTitle, DialogActions, TextField } from '@mui/material'
 import { cyan, pink, lightGreen, purple } from '@mui/material/colors'
@@ -24,15 +24,11 @@ export default function showByLanguage({ params, searchParams }) {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
     const [snackbarMessage, setSnackbarMessage] = useState("")
     const [loading, setLoading] = useState(false)
+    const words = [
+        "Edit your code file here!",
+        "Welcome!"
+    ]
 
-    const [text, count] = useTypewriter({
-        words: [
-            "Edit your code file here",
-            "Welcome!"
-        ],
-        loop: true,
-        delaySpeed: 2000
-    })
 
     //use put to update tfile
 
@@ -154,10 +150,7 @@ export default function showByLanguage({ params, searchParams }) {
 
     return (
         <div>
-            <h1>
-                <span>{text}</span>
-                <Cursor cursorColor="#000000" />
-            </h1>
+            <Banner words={words} />
 
             <motion.div
                 initial={{
