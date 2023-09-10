@@ -7,6 +7,7 @@ import ApiLoading from "@/components/ApiLoading"
 import { lightGreen, pink } from '@mui/material/colors'
 import { MdComment } from "react-icons/md";
 import { useRouter } from "next/navigation";
+import Snackbar from '@/components/Snackbar'
 export default function PDFEditor({ params, searchParams }) {
     const router = useRouter()
     const path = params?.path.join('/')
@@ -127,7 +128,7 @@ export default function PDFEditor({ params, searchParams }) {
                     name,
                     type,
                     path,
-                    comments: commentsRef.current.value
+                    comments
                 })
             }).then(res => {
                 controlSnackbar(true, "success", "comment saved")
@@ -219,7 +220,7 @@ export default function PDFEditor({ params, searchParams }) {
                         :
                         <div>
                             <DialogContent>
-                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth defaultValue={comments} />
+                                <TextField value={comments} onChange={(e) => setComments(e.target.value)} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth />
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setCommentsDialog(false)}>Back</Button>
@@ -255,6 +256,7 @@ export default function PDFEditor({ params, searchParams }) {
                 }
 
             </Dialog>
+            <Snackbar setSnackbarOpen={setSnackbarOpen} snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
         </div>
     );
 }

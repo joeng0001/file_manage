@@ -6,18 +6,44 @@ import ApiLoading from "@/components/ApiLoading"
 import { fabric } from "fabric"
 import { pink, lightGreen, } from '@mui/material/colors'
 import { Button, Dialog, DialogContent, DialogTitle, DialogActions, TextField } from '@mui/material'
+import Snackbar from '@/components/Snackbar'
+import { useRouter } from 'next/navigation';
 export default function ck(props) {
-
+    const router = useRouter()
     const path = props.path
     const name = props.name
     const type = props.type
     const [canvasSub, setCanvasSub] = useState(null)
     const [commentsDialog, setCommentsDialog] = useState(false)
+    const [comments, setComments] = useState("Loading...")
     const [canvasRef, colorRef, widthRef, clearRef] = [useRef(), useRef(), useRef(), useRef()]
     const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
+    const [snackbarOpen, setSnackbarOpen] = useState(false)
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success')
+    const [snackbarMessage, setSnackbarMessage] = useState("")
     const [loading, setLoading] = useState(false)
+    const controlSnackbar = (open, severity, message) => {
+        setSnackbarSeverity(severity)
+        setSnackbarMessage(message)
+        setSnackbarOpen(open)
+    }
     const saveChange = async () => {
-        console.log("saving")
+        const base64String = canvasSub.toDataURL(`image/${type}`)
+        await fetch('/api/file',
+            {
+                method: "PUT",
+                body: JSON.stringify({
+                    name,
+                    type,
+                    path,
+                    base64String: base64String.replace(/^data:image\/\w+;base64,/, '')
+                })
+            }).then(res => {
+                controlSnackbar(true, "success", "file uploaded")
+                fetchFileContent()
+            }).catch(err => {
+                controlSnackbar(true, "error", "Error!" + err.message)
+            })
     }
     const fetchFileContent = async () => {
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
@@ -99,29 +125,95 @@ export default function ck(props) {
                 setLoading(false)
             })
     }
+    const fetchComments = async () => {
+        const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
+            .then(async response => {
+                const res = await response.json()
+                if (!response.ok) {
+                    throw new Error(res.message);
+                }
+                console.log("get res", res)
+                return res
+            })
+            .then(res => {
+                setComments(res.comments)
+            })
+            .catch(e => {
+                controlSnackbar(true, 'error', e.message)
+            });
+    }
+    const saveComments = async () => {
+        setLoading(true)
+        await fetch('/api/file',
+            {
+                method: "PUT",
+                body: JSON.stringify({
+                    name,
+                    type,
+                    path,
+                    comments
+                })
+            }).then(res => {
+                controlSnackbar(true, "success", "comment saved")
+            }).catch(err => {
+                controlSnackbar(true, "error", "Error!" + err.message)
+            }).finally(() => {
+                setCommentsDialog(false)
+                setLoading(false)
+                fetchComments()
+            })
+    }
     useEffect(() => {
         fetchFileContent()
+        fetchComments()
     }, [])
     return (
         <div >
-            <canvas
-                id='canvas-id'
-                ref={canvasRef}
-                width={1400}
-                height={700}
-                onChange={() => { console.log("canvas changing") }}
-
-            />
-            <div>
-                <label htmlFor="color">Color:</label>
-                <input type="color" id="color" ref={colorRef} />
-                <label htmlFor="brush-width">Brush width:</label>
-                <input type="number" id="brush-width" defaultValue={5} ref={widthRef} />
-                <Button variant="contained" id="clear-canvas" color="error" ref={clearRef}>Clear</Button>
-                <Button variant="contained" onClick={saveChange} color="secondary">Save</Button>
-                <Button variant="contained" style={{ backgroundColor: lightGreen[400] }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
-                <Button variant="contained" style={{ backgroundColor: pink[400] }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                <canvas
+                    ref={canvasRef}
+                    width={1400}
+                    height={700}
+                />
             </div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
+                <label >Color:</label>
+                <input type="color" ref={colorRef} />
+                <label >Brush width:</label>
+                <input type="number" defaultValue={5} ref={widthRef} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
+                <Button variant="contained" color="error" ref={clearRef} style={{ marginRight: '10px' }}>Clear</Button>
+                <Button variant="contained" onClick={saveChange} color="secondary" style={{ marginRight: '10px' }}>Save</Button>
+                <Button variant="contained" style={{ backgroundColor: lightGreen[400], marginRight: '10px' }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
+                <Button variant="contained" style={{ backgroundColor: pink[400], marginRight: '10px' }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
+            </div>
+            <Dialog
+                fullWidth={true}
+                maxWidth='sm'
+                open={commentsDialog}
+            >
+                <DialogTitle>
+                    Edit Comment
+                </DialogTitle>
+
+                {
+                    loading ?
+                        <DialogContent>
+                            <ApiLoading />
+                        </DialogContent>
+                        :
+                        <div>
+                            <DialogContent>
+                                <TextField value={comments} onChange={(e) => setComments(e.target.value)} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setCommentsDialog(false)}>Back</Button>
+                                <Button onClick={saveComments}>Save</Button>
+                            </DialogActions>
+                        </div>
+                }
+            </Dialog>
             <Dialog
                 fullWidth={true}
                 maxWidth='sm'
@@ -149,6 +241,7 @@ export default function ck(props) {
                 }
 
             </Dialog>
+            <Snackbar setSnackbarOpen={setSnackbarOpen} snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
         </div>
     )
 }   
