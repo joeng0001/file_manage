@@ -26,6 +26,7 @@ const HTMLToWord = async (base64String) => {
 };
 export const GET = async (request, { params }) => {
   try {
+    console.log("receive get file request");
     const url = new URL(request.url);
     const searchParams = new URLSearchParams(url.search);
     const path = searchParams.get("path");
@@ -34,6 +35,7 @@ export const GET = async (request, { params }) => {
     if (!path || !name || !extension) {
       throw new Error("missing required params");
     }
+    console.log("staret connection to database", path, name, extension);
     await connectToDB();
     const pathList = path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
