@@ -9,15 +9,17 @@ import { cyan, pink, lightGreen, purple } from '@mui/material/colors'
 import { useEffect, useState, useRef } from 'react'
 import Snackbar from '@/components/Snackbar'
 import ApiLoading from '@/components/ApiLoading'
+import { useRouter } from 'next/navigation'
 
 export default function showByLanguage({ params, searchParams }) {
     const path = params?.path.join('/')
     const name = searchParams.name
     const type = searchParams.type
-    const [commentsRef, editorRef] = [useRef(), useRef()]
+    const router = useRouter()
+    const [editorRef] = [useRef()]
     const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
     const [commentsDialog, setCommentsDialog] = useState(false)
-
+    const [comments, setComments] = useState("Loading...")
 
 
     const [snackbarOpen, setSnackbarOpen] = useState(false)
@@ -37,10 +39,10 @@ export default function showByLanguage({ params, searchParams }) {
         await fetch('/api/file',
             {
                 method: "DELETE",
-                body: JSON.stringify({ path: path, name: name })
+                body: JSON.stringify({ path: path, name: name, type: type })
             }).then(res => {
                 controlSnackbar(true, "success", "file deleted")
-                fetchFileContent()
+                router.back()
             }).catch(err => {
                 controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
@@ -87,11 +89,6 @@ export default function showByLanguage({ params, searchParams }) {
     }
 
     const fetchFileContent = async () => {
-
-
-
-        await editorRef.current.editor.setValue("Content loading...")
-
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
@@ -112,14 +109,15 @@ export default function showByLanguage({ params, searchParams }) {
 
     }
     const saveComments = async () => {
-        console.log("saving file comment", path, name, type, commentsRef.current.value)
+        console.log("saving file comment", path, name, type, comments)
         setLoading(true)
         await fetch('/api/file',
             {
                 method: "PUT",
-                body: JSON.stringify({ path, name, type, comments: commentsRef.current.value })
+                body: JSON.stringify({ path, name, type, comments })
             }).then(res => {
                 controlSnackbar(true, "success", "comment saved")
+                fetchComments()
             }).catch(err => {
                 controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
@@ -141,11 +139,25 @@ export default function showByLanguage({ params, searchParams }) {
             }).finally(() => {
                 fetchFileContent()
             })
-
+    }
+    const fetchComments = async () => {
+        const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
+            .then(async response => {
+                const res = await response.json()
+                if (!response.ok) {
+                    throw new Error(res.message);
+                }
+                setComments(res.comments)
+                return res
+            })
+            .catch(e => {
+                controlSnackbar(true, 'error', e.message)
+            });
     }
 
     useEffect(() => {
         fetchFileContent()
+        fetchComments()
     }, [])
 
     return (
@@ -217,7 +229,7 @@ export default function showByLanguage({ params, searchParams }) {
                         :
                         <div>
                             <DialogContent>
-                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth />
+                                <TextField value={comments} onChange={(e) => setComments(e.target.value)} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth />
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setCommentsDialog(false)}>Back</Button>

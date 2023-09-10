@@ -4,10 +4,11 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, }
 import { useState, useEffect, useRef } from "react";
 import Snackbar from '@/components/Snackbar'
 import ApiLoading from "@/components/ApiLoading"
-import { lightGreen } from '@mui/material/colors'
+import { lightGreen, pink } from '@mui/material/colors'
 import { MdComment } from "react-icons/md";
+import { useRouter } from "next/navigation";
 export default function PDFEditor({ params, searchParams }) {
-
+    const router = useRouter()
     const path = params?.path.join('/')
     const name = searchParams.name
     const type = searchParams.type
@@ -19,6 +20,8 @@ export default function PDFEditor({ params, searchParams }) {
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
     const [snackbarMessage, setSnackbarMessage] = useState("")
+    const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
+
     const controlSnackbar = (open, severity, message) => {
         setSnackbarSeverity(severity)
         setSnackbarMessage(message)
@@ -75,7 +78,7 @@ export default function PDFEditor({ params, searchParams }) {
                         method: "PUT",
                         body: JSON.stringify({
                             name,
-                            extension: '.pdf',
+                            type,
                             path,
                             base64String
                         })
@@ -155,7 +158,25 @@ export default function PDFEditor({ params, searchParams }) {
             });
     }
 
+    const confirmDeleteFile = async () => {
+        setLoading(true)
+        await fetch('/api/file',
+            {
+                method: "DELETE",
+                body: JSON.stringify({ path: path, name: name, type: type })
+            }).then(res => {
+                controlSnackbar(true, "success", "file deleted")
+                router.back()
+            }).catch(err => {
+                controlSnackbar(true, "error", "Error!" + err.message)
+            }).finally(() => {
+                setConfirmDeleteDialog(false)
+                setLoading(false)
+            })
+    }
+
     useEffect(() => {
+
         fetchFileContent()
         fetchComments()
     }, [])
@@ -174,9 +195,12 @@ export default function PDFEditor({ params, searchParams }) {
                         className="HidedButton" />
                 </Button>
                 it back for editing</div>
-            <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: lightGreen[400] }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
-            <embed id="embed" src={url} type="application/pdf" width="90%" style={{ height: '70vh' }} ></embed>
+            <div style={{ marginBottom: '10px' }}>
+                <Button variant="contained" style={{ backgroundColor: lightGreen[400] }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
 
+                <Button variant='contained' style={{ marginLeft: '10px', backgroundColor: pink[700] }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
+            </div>
+            <embed id="embed" src={url} type="application/pdf" width="90%" style={{ height: '70vh' }} ></embed>
             <Snackbar setSnackbarOpen={setSnackbarOpen} snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
             <Dialog
                 fullWidth={true}
@@ -203,6 +227,33 @@ export default function PDFEditor({ params, searchParams }) {
                             </DialogActions>
                         </div>
                 }
+            </Dialog>
+            <Dialog
+                fullWidth={true}
+                maxWidth='sm'
+                open={confirmDeleteDialog}
+            >
+                <DialogTitle>
+                    <span style={{ fontSize: '24px', fontWeight: '300', color: 'red' }}>Alert</span>
+                </DialogTitle>
+                {
+                    loading ?
+                        <DialogContent>
+                            <ApiLoading />
+                        </DialogContent>
+                        :
+                        <div>
+                            <DialogContent>
+                                <div>Delete file <span style={{ fontSize: '24px', fontWeight: '200', color: 'red' }}>{name}</span> is Irretrievable!</div>
+                                <div style={{ marginTop: '15px' }}>Stay in the page and save a file can re-create the file</div>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setConfirmDeleteDialog(false)}>Cancel</Button>
+                                <Button onClick={() => confirmDeleteFile()}>Confirm</Button>
+                            </DialogActions>
+                        </div>
+                }
+
             </Dialog>
         </div>
     );

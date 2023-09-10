@@ -37,10 +37,13 @@ export const GET = async (request, { params }) => {
     await connectToDB();
     const pathList = path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
-    const fileId = parentFolder.fileList.find(
+    const fileObj = parentFolder.fileList.find(
       (item) => item.name === name && item.extension === extension
-    )?._id;
-    const file = await File.findById(fileId);
+    );
+    if (!fileObj) {
+      throw new Error("File not existed");
+    }
+    const file = await File.findById(fileObj._id);
     await File.findByIdAndUpdate(file._id, {
       lastViewAt: new Date(),
     });
@@ -69,7 +72,7 @@ export const POST = async (request, { params }) => {
     if (!fileAllowExtension.includes(req.extension)) {
       throw new Error("file type not allowed");
     }
-    if (!req.path || !req.name || !req.extension || !req.base64String) {
+    if (!req.path || !req.name || !req.extension) {
       throw new Error("missing required params");
     }
     await connectToDB();
@@ -114,12 +117,14 @@ export const PUT = async (request) => {
   try {
     console.log("receive save file request");
     const req = await request.json();
+    console.log("req", req);
     if (
       !req.type ||
       !req.path ||
       !req.name ||
       !(req.comments || req.base64String)
     ) {
+      console.log("throwing error");
       throw new Error("missing required params");
     }
     const extension = type2extensionDictionary[req.type];
@@ -169,18 +174,21 @@ export const PUT = async (request) => {
 export const DELETE = async (request) => {
   try {
     const req = await request.json();
-    if (!req.path || !req.name) {
+    if (!req.path || !req.name || !req.type) {
       throw new Error("missing required params");
     }
     await connectToDB();
     const pathList = req.path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
+    const extension = type2extensionDictionary[req.type];
     const fileObj = parentFolder?.fileList?.find(
-      (item) => item.name === req.name
+      (item) => item.name === req.name && item.extension === extension
     );
     if (!fileObj) {
       throw new Error("file not existed");
     }
+    console.log("fileObj", fileObj);
+    console.log("parent folder", parentFolder);
     await File.deleteOne({ _id: fileObj._id });
     await Folder.findByIdAndUpdate(parentFolder._id, {
       fileList: parentFolder.fileList.filter(
