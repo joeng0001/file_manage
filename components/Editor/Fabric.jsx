@@ -28,7 +28,8 @@ export default function ck(props) {
         setSnackbarOpen(open)
     }
     const saveChange = async () => {
-        const base64String = canvasSub.toDataURL(`image/${type}`)
+        const base64String = await canvasSub.toDataURL(`image/${type}`)
+        console.log("get base64string", base64String)
         await fetch('/api/file',
             {
                 method: "PUT",
@@ -40,12 +41,12 @@ export default function ck(props) {
                 })
             }).then(res => {
                 controlSnackbar(true, "success", "file uploaded")
-                fetchFileContent()
+                fetchFileContent(canvasSub)
             }).catch(err => {
                 controlSnackbar(true, "error", "Error!" + err.message)
             })
     }
-    const fetchFileContent = async () => {
+    const fetchFileContent = async (canvas) => {
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
@@ -56,11 +57,10 @@ export default function ck(props) {
             })
             .then(async res => {
                 const byteCharacters = atob(res.content);
-                initCanvas(byteCharacters)
+                resetCanvasBackground(canvas, byteCharacters)
             })
             .catch(e => {
-                console.error(e)
-                //controlSnackbar(true, 'error', e.message)
+                controlSnackbar(true, 'error', e.message)
             });
     }
     const initCanvas = (byteCharacters) => {
@@ -70,7 +70,30 @@ export default function ck(props) {
         setCanvasSub(canvas)
         canvas.freeDrawingBrush.color = 'black';
         canvas.freeDrawingBrush.width = 5;
-        // init image
+        //resetCanvasBackground(canvas, byteCharacters)
+        // config toobar element
+        colorRef.current.addEventListener('change', function (e) {
+            canvas.freeDrawingBrush.color = e.target.value;
+        });
+
+        widthRef.current.addEventListener('change', function (e) {
+            canvas.freeDrawingBrush.width = parseInt(e.target.value, 10);
+        });
+
+        clearRef.current.addEventListener('click', function (e) {
+            canvas.clear()
+            fabric.Image.fromURL(url, (img) => {
+                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                    scaleX: canvas.width / img.width,
+                    scaleY: canvas.height / img.height
+                });
+            });
+
+        });
+        fetchFileContent(canvas)
+    }
+
+    const resetCanvasBackground = async (canvas, byteCharacters) => {
         const binaryString = byteCharacters
         const arrayBuffer = new ArrayBuffer(binaryString.length);
         const uint8Array = new Uint8Array(arrayBuffer);
@@ -85,29 +108,7 @@ export default function ck(props) {
                 scaleY: canvas.height / img.height
             });
         });
-        // config toobar element
-        colorRef.current.addEventListener('change', function (e) {
-            canvas.freeDrawingBrush.color = e.target.value;
-        });
-
-        widthRef.current.addEventListener('change', function (e) {
-            canvas.freeDrawingBrush.width = parseInt(e.target.value, 10);
-        });
-
-        clearRef.current.addEventListener('click', function (e) {
-            console.log("clearing")
-            canvas.clear()
-            //reset the image
-            fabric.Image.fromURL(url, (img) => {
-                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
-                    scaleX: canvas.width / img.width,
-                    scaleY: canvas.height / img.height
-                });
-            });
-
-        });
     }
-
     const confirmDeleteFile = async () => {
         setLoading(true)
         await fetch('/api/file',
@@ -116,7 +117,6 @@ export default function ck(props) {
                 body: JSON.stringify({ path: path, name: name, type: type })
             }).then(res => {
                 controlSnackbar(true, "success", "file deleted")
-                //fetchFileContent()
                 router.back()
             }).catch(err => {
                 controlSnackbar(true, "error", "Error!" + err.message)
@@ -126,7 +126,7 @@ export default function ck(props) {
             })
     }
     const fetchComments = async () => {
-        const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
+        await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
                 if (!response.ok) {
@@ -164,7 +164,7 @@ export default function ck(props) {
             })
     }
     useEffect(() => {
-        fetchFileContent()
+        initCanvas()
         fetchComments()
     }, [])
     return (
@@ -174,6 +174,7 @@ export default function ck(props) {
                     ref={canvasRef}
                     width={1400}
                     height={700}
+                    onChange={() => { console.log("changing canvas") }}
                 />
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>
