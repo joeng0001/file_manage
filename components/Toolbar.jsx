@@ -119,15 +119,6 @@ export default function toolbar(props) {
                 setLoading(false)
             })
     }
-    const apitest = async () => {
-        //console.log(props.path)
-        await fetch(`/api/folder?path=java`)
-            .then(async (res) => {
-                const a = await res.json()
-                console.log(a)
-                props.controlSnackbar(true, "success", "uplaod success")
-            })
-    }
     const renderOption = (props, option, state) => {
         console.log(props, option)
         return (
@@ -173,7 +164,6 @@ export default function toolbar(props) {
                 </Button>
                 <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: pink[400] }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
                 <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: lightGreen[400] }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
-                <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: purple[400] }} onClick={apitest}>API test</Button>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Button onClick={() => props.lastPage()} variant="contained" style={{ marginRight: '5px', backgroundColor: purple[400] }}>
                         <BsArrowLeftSquareFill size={20} />

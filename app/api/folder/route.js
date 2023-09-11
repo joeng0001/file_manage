@@ -66,7 +66,7 @@ export const POST = async (request, { params }) => {
     }
     const folder = new Folder({
       name: req.name.replace(" ", ""),
-      comment: req.comment,
+      comments: req.comments,
       parentFolderId: parentFolder._id,
       level: pathList.length + 1,
       path: req.path,
