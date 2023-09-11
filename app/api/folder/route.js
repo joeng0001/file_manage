@@ -65,7 +65,7 @@ export const POST = async (request, { params }) => {
       throw new Error("folder already exist");
     }
     const folder = new Folder({
-      name: req.name,
+      name: req.name.replace(" ", ""),
       comment: req.comment,
       parentFolderId: parentFolder._id,
       level: pathList.length + 1,

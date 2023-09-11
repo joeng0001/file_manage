@@ -28,7 +28,8 @@ export default function toolbar(props) {
                     name: fileRef.current.value + fileExtension,
                     extension: fileExtension,
                     path: props.path,
-                    comment: fileCommentRef.current.value
+                    comment: fileCommentRef.current.value,
+                    base64String: btoa("")
                 })
             }).then(res => {
                 props.controlSnackbar(true, "success", "empty file created")

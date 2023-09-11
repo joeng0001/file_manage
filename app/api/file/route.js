@@ -77,10 +77,12 @@ export const POST = async (request, { params }) => {
     if (!req.path || !req.name || !req.extension) {
       throw new Error("missing required params");
     }
+    console.log("receive create file request,", req);
     await connectToDB();
     const pathList = req.path?.split("/");
     await createRootFolderIfNotExist(pathList[0]);
     const parentFolder = await getFolder(pathList, 1, pathList.length);
+    console.log("afte rget parent folder", parentFolder);
     if (
       parentFolder.fileList.find(
         (file) => file.name === req.name && file.extension === req.extension
@@ -96,6 +98,7 @@ export const POST = async (request, { params }) => {
       base64String: req.base64String ?? null,
       path: req.path,
     });
+    console.log("saving new file", file);
     const new_file = await file.save();
     parentFolder.fileList.push({
       _id: new_file._id,

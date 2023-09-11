@@ -7,7 +7,6 @@ import ApiLoading from "@/components/ApiLoading"
 import { lightGreen, pink } from '@mui/material/colors'
 import { MdComment } from "react-icons/md";
 import { useRouter } from "next/navigation";
-import Snackbar from '@/components/Snackbar'
 export default function PDFEditor({ params, searchParams }) {
     const router = useRouter()
     const path = params?.path.join('/')
