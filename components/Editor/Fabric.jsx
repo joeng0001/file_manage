@@ -29,7 +29,6 @@ export default function ck(props) {
     }
     const saveChange = async () => {
         const base64String = await canvasSub.toDataURL(`image/${type}`)
-        console.log("get base64string", base64String)
         await fetch('/api/file',
             {
                 method: "PUT",
@@ -132,7 +131,6 @@ export default function ck(props) {
                 if (!response.ok) {
                     throw new Error(res.message);
                 }
-                console.log("get res", res)
                 return res
             })
             .then(res => {
@@ -174,7 +172,6 @@ export default function ck(props) {
                     ref={canvasRef}
                     width={1400}
                     height={700}
-                    onChange={() => { console.log("changing canvas") }}
                 />
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '5px' }}>

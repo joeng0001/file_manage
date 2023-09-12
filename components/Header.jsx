@@ -65,7 +65,6 @@ export default function header() {
 
     const initOptionsList = async () => {
         setLoadingSearchList(true)
-        console.log("init option list")
         const res = await fetch(`/api/searchList`,)
         const real_res = await res.json()
 
@@ -87,10 +86,8 @@ export default function header() {
     }
 
     const initRecentViewList = async () => {
-        console.log("init recent view list")
         const res = await fetch(`/api/recentView`,)
         const real_res = await res.json()
-        console.log("recent record", real_res)
         setRecentFolderList(real_res.folderList)
         setRecentFileList(real_res.fileList)
     }

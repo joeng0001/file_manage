@@ -66,7 +66,6 @@ export default function toolbar(props) {
             const targetFile = e.target.files[0]
             const reader = new FileReader();
             reader.readAsDataURL(e.target.files[0]);
-            console.log(e.target.files[0])
             reader.onload = async () => {
                 let base64String = reader.result.split(',')[1];
 
@@ -120,7 +119,6 @@ export default function toolbar(props) {
             })
     }
     const renderOption = (props, option, state) => {
-        console.log(props, option)
         return (
 
             <li {...props} key={option.extension} >

@@ -1,36 +1,37 @@
 "use client"
-
-import AceEditor from '@/components/Editor/AceEditor'
+import QuillEditor from "@/components/Editor/QuillEditor"
 import { motion } from "framer-motion"
-import Banner from "@/components/Banner"
+import { Cursor, useTypewriter } from 'react-simple-typewriter'
 import Decoration from '@/components/DecorationFloadtingBtn'
 import { Button, Dialog, DialogContent, DialogTitle, DialogActions, TextField } from '@mui/material'
 import { cyan, pink, lightGreen, purple } from '@mui/material/colors'
 import { useEffect, useState, useRef } from 'react'
 import Snackbar from '@/components/Snackbar'
 import ApiLoading from '@/components/ApiLoading'
-import { useRouter } from 'next/navigation'
 
 export default function showByLanguage({ params, searchParams }) {
     const path = params?.path.join('/')
     const name = searchParams.name
     const type = searchParams.type
-    const router = useRouter()
-    const [editorRef] = [useRef()]
+    const [commentsRef, editorRef] = [useRef(), useRef()]
     const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
     const [commentsDialog, setCommentsDialog] = useState(false)
-    const [comments, setComments] = useState("Loading...")
+
 
 
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
     const [snackbarMessage, setSnackbarMessage] = useState("")
     const [loading, setLoading] = useState(false)
-    const words = [
-        "Edit your code file here!",
-        "Welcome!"
-    ]
 
+    const [text, count] = useTypewriter({
+        words: [
+            "Edit your code file here",
+            "Welcome!"
+        ],
+        loop: true,
+        delaySpeed: 2000
+    })
 
     //use put to update tfile
 
@@ -39,10 +40,10 @@ export default function showByLanguage({ params, searchParams }) {
         await fetch('/api/file',
             {
                 method: "DELETE",
-                body: JSON.stringify({ path: path, name: name, type: type })
+                body: JSON.stringify({ path: path, name: name })
             }).then(res => {
-                controlSnackbar(true, "success", "file deleted")
-                router.back()
+                controlSnackbar(true, "success", "folder deleted")
+                fetchFileContent()
             }).catch(err => {
                 controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
@@ -89,6 +90,11 @@ export default function showByLanguage({ params, searchParams }) {
     }
 
     const fetchFileContent = async () => {
+
+
+
+        await editorRef.current.editor.setValue("Content loading...")
+
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
@@ -113,10 +119,9 @@ export default function showByLanguage({ params, searchParams }) {
         await fetch('/api/file',
             {
                 method: "PUT",
-                body: JSON.stringify({ path, name, type, comments })
+                body: JSON.stringify({ path, name, type, comments: commentsRef.current.value })
             }).then(res => {
                 controlSnackbar(true, "success", "comment saved")
-                fetchComments()
             }).catch(err => {
                 controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
@@ -137,30 +142,19 @@ export default function showByLanguage({ params, searchParams }) {
             }).finally(() => {
                 fetchFileContent()
             })
-    }
-    const fetchComments = async () => {
-        const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
-            .then(async response => {
-                const res = await response.json()
-                if (!response.ok) {
-                    throw new Error(res.message);
-                }
-                setComments(res.comments)
-                return res
-            })
-            .catch(e => {
-                controlSnackbar(true, 'error', e.message)
-            });
+
     }
 
     useEffect(() => {
         fetchFileContent()
-        fetchComments()
     }, [])
 
     return (
         <div>
-            <Banner words={words} />
+            <h1>
+                <span>{text}</span>
+                <Cursor cursorColor="#000000" />
+            </h1>
 
             <motion.div
                 initial={{
@@ -182,7 +176,7 @@ export default function showByLanguage({ params, searchParams }) {
                 <Button variant='contained' style={{ marginRight: '10px', backgroundColor: cyan[700] }} onClick={() => setCommentsDialog(true)}>Edit Comment</Button>
                 <Button variant='contained' style={{ marginRight: '10px', backgroundColor: purple[700] }} onClick={getZip}>Get Zip File</Button>
             </motion.div>
-            <AceEditor type={type} loading={loading} editorRef={editorRef} />
+            <QuillEditor type={type} loading={loading} editorRef={editorRef} />
             <Dialog
                 fullWidth={true}
                 maxWidth='sm'
@@ -227,7 +221,7 @@ export default function showByLanguage({ params, searchParams }) {
                         :
                         <div>
                             <DialogContent>
-                                <TextField value={comments} onChange={(e) => setComments(e.target.value)} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth />
+                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth />
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setCommentsDialog(false)}>Back</Button>

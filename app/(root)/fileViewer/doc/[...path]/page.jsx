@@ -86,7 +86,6 @@ export default function showByLanguage({ params, searchParams }) {
     }
 
     const fetchFileContent = async () => {
-        console.log("fetching content")
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
@@ -96,7 +95,6 @@ export default function showByLanguage({ params, searchParams }) {
                 return res
             })
             .then(async res => {
-                console.log("setting editor content", atob(res.content))
                 setEditorContent(atob(res.content))
             })
             .catch(e => {
@@ -122,8 +120,6 @@ export default function showByLanguage({ params, searchParams }) {
             })
     }
     const saveFileContent = async () => {
-        console.log(editorContent)
-        console.log(btoa(editorContent))
         await fetch('/api/file',
             {
                 method: "PUT",
@@ -152,7 +148,6 @@ export default function showByLanguage({ params, searchParams }) {
                 return res
             })
             .then(async res => {
-                console.log("after fetch comments setting comments", comments)
                 setComments(res.comments)
             })
             .catch(e => {

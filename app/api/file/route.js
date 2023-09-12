@@ -18,7 +18,6 @@ const WordToHTML = async (base64String) => {
 const HTMLToWord = async (base64String) => {
   const htmlContent = Buffer.from(base64String, "base64").toString("utf-8");
   const stringText = htmlContent.toString("utf-8");
-  console.log(stringText);
   const fileBuffer = await HTMLtoDOCX(stringText);
 
   const outputBase64String = fileBuffer.toString("base64");
@@ -26,7 +25,6 @@ const HTMLToWord = async (base64String) => {
 };
 export const GET = async (request, { params }) => {
   try {
-    console.log("receive get file request");
     const url = new URL(request.url);
     const searchParams = new URLSearchParams(url.search);
     const path = searchParams.get("path");
@@ -35,7 +33,6 @@ export const GET = async (request, { params }) => {
     if (!path || !name || !extension) {
       throw new Error("missing required params");
     }
-    console.log("staret connection to database", path, name, extension);
     await connectToDB();
     const pathList = path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
@@ -77,12 +74,12 @@ export const POST = async (request, { params }) => {
     if (!req.path || !req.name || !req.extension) {
       throw new Error("missing required params");
     }
-    console.log("receive create file request,", req);
+
     await connectToDB();
     const pathList = req.path?.split("/");
     await createRootFolderIfNotExist(pathList[0]);
     const parentFolder = await getFolder(pathList, 1, pathList.length);
-    console.log("afte rget parent folder", parentFolder);
+
     if (
       parentFolder.fileList.find(
         (file) => file.name === req.name && file.extension === req.extension
@@ -98,7 +95,7 @@ export const POST = async (request, { params }) => {
       base64String: req.base64String ?? null,
       path: req.path,
     });
-    console.log("saving new file", file);
+
     const new_file = await file.save();
     parentFolder.fileList.push({
       _id: new_file._id,
@@ -120,27 +117,23 @@ export const POST = async (request, { params }) => {
 
 export const PUT = async (request) => {
   try {
-    console.log("receive save file request");
     const req = await request.json();
-    console.log("req", req);
     if (
       !req.type ||
       !req.path ||
       !req.name ||
       !(req.comments || req.base64String)
     ) {
-      console.log("throwing error");
       throw new Error("missing required params");
     }
     const extension = type2extensionDictionary[req.type];
-    console.log("get extension", extension);
+
     await connectToDB();
     const pathList = req.path?.split("/");
     const parentFolder = await getFolder(pathList, 1, pathList.length);
     const file = parentFolder.fileList.find(
       (file) => file.name === req.name && file.extension === extension
     );
-    console.log("get file", file);
     if (!file) {
       throw new Error("file not exist");
     }
@@ -151,22 +144,17 @@ export const PUT = async (request) => {
         lastViewAt: new Date(),
       });
     } else if (req.base64String) {
-      console.log("receive file base64String", req.base64String);
-
       const newFile = {
         base64String: req.base64String,
         modifiedAt: new Date(),
         lastViewAt: new Date(),
       };
       if (extension === ".doc" || extension === ".docx") {
-        console.log("before converting");
         newFile.base64String = await HTMLToWord(req.base64String);
-        console.log("after converting");
       }
       const newFile1 = await File.findByIdAndUpdate(file._id, newFile, {
         new: true,
       });
-      console.log("save new file", newFile1);
     }
     return new Response(JSON.stringify({ data: "success" }), { status: 200 });
   } catch (error) {
@@ -192,8 +180,6 @@ export const DELETE = async (request) => {
     if (!fileObj) {
       throw new Error("file not existed");
     }
-    console.log("fileObj", fileObj);
-    console.log("parent folder", parentFolder);
     await File.deleteOne({ _id: fileObj._id });
     await Folder.findByIdAndUpdate(parentFolder._id, {
       fileList: parentFolder.fileList.filter(

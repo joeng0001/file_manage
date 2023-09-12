@@ -92,18 +92,15 @@ export default function PDFEditor({ params, searchParams }) {
         }
     }
     const fetchFileContent = async () => {
-        console.log("fetching data")
         const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
                 if (!response.ok) {
                     throw new Error(res.message);
                 }
-                console.log("get res", res)
                 return res
             })
             .then(res => {
-                console.log("get return res", res)
                 setComments(res.comments)
                 const byteCharacters = atob(res.content);
                 const byteNumbers = new Array(byteCharacters.length);
@@ -147,7 +144,6 @@ export default function PDFEditor({ params, searchParams }) {
                 if (!response.ok) {
                     throw new Error(res.message);
                 }
-                console.log("get res", res)
                 return res
             })
             .then(res => {
