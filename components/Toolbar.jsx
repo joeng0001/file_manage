@@ -279,7 +279,6 @@ export default function toolbar(props) {
                 <DialogTitle>
                     Edit Comment
                 </DialogTitle>
-
                 {
                     loading ?
                         <DialogContent>
@@ -321,7 +320,6 @@ export default function toolbar(props) {
                             </DialogActions>
                         </div>
                 }
-
             </Dialog>
         </div>
 

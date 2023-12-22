@@ -1,6 +1,6 @@
 export default function loading() {
     return (
-        < div className="loading" >
+        <div className="loading">
             <span>L</span>
             <span>o</span>
             <span>a</span>

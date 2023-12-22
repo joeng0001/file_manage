@@ -2,11 +2,9 @@
 
 import "react-quill/dist/quill.snow.css";
 import dynamic from 'next/dynamic';
-import { useRef } from "react";
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 export default function QuillEditor(props) {
-
     const handleChange = (v) => {
         props.setEditorContent(v)
     }

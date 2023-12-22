@@ -1,5 +1,4 @@
 "use client"
-
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, } from "@mui/material";
 import { useState, useEffect, useRef } from "react";
 import Snackbar from '@/components/Snackbar'
@@ -16,6 +15,7 @@ export default function PDFEditor({ params, searchParams }) {
     const [inputRef, commentsRef] = [useRef(), useRef()]
     const [comments, setComments] = useState("")
     const [commentsDialog, setCommentsDialog] = useState(false)
+
     const [loading, setLoading] = useState(false)
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
@@ -29,8 +29,7 @@ export default function PDFEditor({ params, searchParams }) {
     }
 
     const fileDownload = async (e) => {
-
-        const res = await fetch(`/api/file?path=${path}&name=${name}&type=${type}`)
+        await fetch(`/api/file?path=${path}&name=${name}&type=${type}`)
             .then(async response => {
                 const res = await response.json()
                 if (!response.ok) {
@@ -63,8 +62,6 @@ export default function PDFEditor({ params, searchParams }) {
             .catch(e => {
                 controlSnackbar(true, 'error', e.message)
             });
-
-
     }
 
     const fileUpload = (e) => {
@@ -92,7 +89,7 @@ export default function PDFEditor({ params, searchParams }) {
         }
     }
     const fetchFileContent = async () => {
-        const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
+        await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
                 if (!response.ok) {
@@ -138,7 +135,7 @@ export default function PDFEditor({ params, searchParams }) {
     }
 
     const fetchComments = async () => {
-        const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
+        await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
                 if (!response.ok) {
@@ -172,7 +169,6 @@ export default function PDFEditor({ params, searchParams }) {
     }
 
     useEffect(() => {
-
         fetchFileContent()
         fetchComments()
     }, [])
@@ -182,8 +178,6 @@ export default function PDFEditor({ params, searchParams }) {
                 <Button style={{ marginLeft: '10px', marginRight: '10px' }} variant="outlined" onClick={fileDownload} >
                     Download
                 </Button>
-
-
                 and
                 <Button style={{ marginLeft: '10px', marginRight: '10px' }} variant="outlined" onClick={() => { inputRef.current.click() }} >
                     UPLOAD
@@ -206,7 +200,6 @@ export default function PDFEditor({ params, searchParams }) {
                 <DialogTitle>
                     Edit Comment
                 </DialogTitle>
-
                 {
                     loading ?
                         <DialogContent>

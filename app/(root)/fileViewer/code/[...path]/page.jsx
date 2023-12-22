@@ -21,7 +21,6 @@ export default function showByLanguage({ params, searchParams }) {
     const [commentsDialog, setCommentsDialog] = useState(false)
     const [comments, setComments] = useState("Loading...")
 
-
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
     const [snackbarMessage, setSnackbarMessage] = useState("")
@@ -30,9 +29,6 @@ export default function showByLanguage({ params, searchParams }) {
         "Edit your code file here!",
         "Welcome!"
     ]
-
-
-    //use put to update tfile
 
     const confirmDeleteFile = async () => {
         setLoading(true)
@@ -58,8 +54,6 @@ export default function showByLanguage({ params, searchParams }) {
 
     const getZip = async () => {
         try {
-
-
             const res = await fetch(`/api/zipFile?path=${path}&name=${name}&type=${type}`)
             const real_res = await res.json()
             const byteCharacters = atob(real_res);
@@ -85,7 +79,6 @@ export default function showByLanguage({ params, searchParams }) {
         } catch (e) {
             controlSnackbar(true, 'error', e.message)
         }
-
     }
 
     const fetchFileContent = async () => {
@@ -122,7 +115,6 @@ export default function showByLanguage({ params, searchParams }) {
             }).finally(() => {
                 setLoading(false)
                 setCommentsDialog(false)
-
             })
     }
     const saveFileContent = async () => {
@@ -161,7 +153,6 @@ export default function showByLanguage({ params, searchParams }) {
     return (
         <div>
             <Banner words={words} />
-
             <motion.div
                 initial={{
                     x: 2000

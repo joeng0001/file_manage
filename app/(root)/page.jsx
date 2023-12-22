@@ -1,11 +1,8 @@
-
-
 import { SignOutButton, UserButton, SignedIn } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from 'next/link'
 import { homeList } from '@/lib/constant'
 //import {usePathname,useRouter} from 'next/navigation'
-import { dark } from '@clerk/themes'
 import { Grid, Box } from '@mui/material'
 export default function Home() {
   return (

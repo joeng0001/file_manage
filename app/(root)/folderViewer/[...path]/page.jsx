@@ -30,7 +30,6 @@ export default function fileList({ params, searchParams }) {
         router.push(`/folderViewer/${pathsList.join('/')}?page=${page * 1 - 1}`)
     }
 
-
     const controlSnackbar = (open, severity, message) => {
         setSnackbarSeverity(severity)
         setSnackbarMessage(message)
@@ -47,7 +46,6 @@ export default function fileList({ params, searchParams }) {
     }
 
     const fetchComments = async () => {
-
         const res = await fetch(`/api/folder?path=${pathsList.join('/')}&page=${page}`)
         const real_res = await res.json()
         setComments(real_res.comments)
@@ -56,7 +54,6 @@ export default function fileList({ params, searchParams }) {
         fetchData()
         fetchComments()
     }, [page])
-    // prompt dialog ,get name  and create file ,then redirect to that page
     return (
         <div className="homeBackGround">
             <div className="GridContainer">

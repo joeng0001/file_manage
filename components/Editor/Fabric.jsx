@@ -1,7 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from 'react';
 import { MdComment } from 'react-icons/md'
-
 import ApiLoading from "@/components/ApiLoading"
 import { fabric } from "fabric"
 import { pink, lightGreen, } from '@mui/material/colors'
@@ -69,8 +68,6 @@ export default function ck(props) {
         setCanvasSub(canvas)
         canvas.freeDrawingBrush.color = 'black';
         canvas.freeDrawingBrush.width = 5;
-        //resetCanvasBackground(canvas, byteCharacters)
-        // config toobar element
         colorRef.current.addEventListener('change', function (e) {
             canvas.freeDrawingBrush.color = e.target.value;
         });
@@ -194,7 +191,6 @@ export default function ck(props) {
                 <DialogTitle>
                     Edit Comment
                 </DialogTitle>
-
                 {
                     loading ?
                         <DialogContent>
@@ -237,7 +233,6 @@ export default function ck(props) {
                             </DialogActions>
                         </div>
                 }
-
             </Dialog>
             <Snackbar setSnackbarOpen={setSnackbarOpen} snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
         </div>

@@ -1,4 +1,4 @@
-import { Schema, model, models, SchemaType } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 const FileSchema = new Schema({
   parentFolderId: {

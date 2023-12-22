@@ -31,21 +31,16 @@ export default function header() {
     const [options, setOptions] = useState([])
     const [recentFileList, setRecentFileList] = useState([])
     const [recentFolderList, setRecentFolderList] = useState([])
-    // Create a custom styled component for the dropdown list
 
     const renderOption = (props, option, state) => {
         const backgroundColor = option.label === 'file' ? 'lightgray' : 'darkgray'; // Customize background color based on option type
-
         return (
-
-
             <li {...props} key={option.id} style={{ backgroundColor, borderBottom: '1px solid gray' }} >
                 <Tooltip title={option.path ?? 'path not provided'} placement="right">
                     <div>
                         <span style={{ fontWeight: 600 }}>
                             [{option.label}]
                         </span>
-
                         &nbsp;{option.name}</div>
                 </Tooltip>
             </li>
@@ -58,7 +53,6 @@ export default function header() {
         display: 'flex',
         alignItems: 'center',
         padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
         ...theme.mixins.toolbar,
         justifyContent: 'flex-end',
     }));
@@ -86,7 +80,10 @@ export default function header() {
     }
 
     const initRecentViewList = async () => {
-        const res = await fetch(`/api/recentView`,)
+        const res = await fetch(`/api/recentView`)
+            .catch(e => {
+                console.error(e)
+            })
         const real_res = await res.json()
         setRecentFolderList(real_res.folderList)
         setRecentFileList(real_res.fileList)
@@ -214,8 +211,6 @@ export default function header() {
                             )
                         })
                     }
-
-
                 </List>
                 <Divider />
                 <List>
@@ -245,21 +240,17 @@ export default function header() {
                             )
                         })
                     }
-
                 </List>
                 <Box sx={{ flexGrow: 1, flexDirection: 'column' }} />
                 <List style={{ marginBottom: '10px' }}>
                     <Link href="/about" className="disableLinkStyle" style={{ color: 'black' }}>
                         <ListItem disablePadding>
                             <ListItemButton>
-
                                 <ListItemIcon>
                                     <FcAbout />
                                 </ListItemIcon>
                                 <ListItemText primary={"about"} />
-
                             </ListItemButton>
-
                         </ListItem>
                     </Link>
                     <ListItem disablePadding >
@@ -275,8 +266,6 @@ export default function header() {
                         </SignOutButton>
                     </ListItem>
                 </List>
-
-
             </Drawer>
             <DrawerHeader />
         </div>

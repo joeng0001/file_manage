@@ -1,5 +1,4 @@
 "use client"
-import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 const Editor = dynamic(() => import('@/components/Editor/Fabric'), {
@@ -9,7 +8,6 @@ export default function ck({ params, searchParams }) {
     const path = params?.path.join('/')
     const name = searchParams.name
     const type = searchParams.type
-
 
     return (
         <div>

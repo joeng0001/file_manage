@@ -1,5 +1,4 @@
 "use client"
-
 import { Cursor, useTypewriter } from 'react-simple-typewriter'
 
 export default function Banner(props) {

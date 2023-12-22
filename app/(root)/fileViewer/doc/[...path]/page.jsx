@@ -5,15 +5,13 @@ import Banner from "@/components/Banner"
 import Decoration from '@/components/DecorationFloadtingBtn'
 import { Button, Dialog, DialogContent, DialogTitle, DialogActions, TextField } from '@mui/material'
 import { cyan, pink, lightGreen, purple } from '@mui/material/colors'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Snackbar from '@/components/Snackbar'
 import ApiLoading from '@/components/ApiLoading'
 import { useRouter } from "next/navigation"
 
 export default function showByLanguage({ params, searchParams }) {
-
     const router = useRouter()
-
     const words = [
         "Welcome!",
         "Edit your doc/docx file here!"
@@ -30,8 +28,6 @@ export default function showByLanguage({ params, searchParams }) {
     const [snackbarSeverity, setSnackbarSeverity] = useState('success')
     const [snackbarMessage, setSnackbarMessage] = useState("")
     const [loading, setLoading] = useState(false)
-
-    //use put to update tfile
 
     const confirmDeleteFile = async () => {
         setLoading(true)
@@ -86,7 +82,7 @@ export default function showByLanguage({ params, searchParams }) {
     }
 
     const fetchFileContent = async () => {
-        const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
+        await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
                 if (!response.ok) {
@@ -139,7 +135,7 @@ export default function showByLanguage({ params, searchParams }) {
     }
 
     const fetchComments = async () => {
-        const res = await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
+        await fetch(`/api/file?name=${name}&type=${type}&path=${path}`)
             .then(async response => {
                 const res = await response.json()
                 if (!response.ok) {
@@ -219,7 +215,6 @@ export default function showByLanguage({ params, searchParams }) {
                 <DialogTitle>
                     Edit Comment
                 </DialogTitle>
-
                 {
                     loading ?
                         <DialogContent>

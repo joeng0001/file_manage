@@ -40,11 +40,6 @@ export default function about() {
                     <div className="card-content"><SiGithub style={{ marginRight: '10px' }} />Github : joeng0001</div>
                 </div>
             </div>
-
-
-
-
-
         </div>
     )
 }

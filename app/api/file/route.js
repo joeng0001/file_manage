@@ -79,7 +79,6 @@ export const POST = async (request, { params }) => {
     const pathList = req.path?.split("/");
     await createRootFolderIfNotExist(pathList[0]);
     const parentFolder = await getFolder(pathList, 1, pathList.length);
-
     if (
       parentFolder.fileList.find(
         (file) => file.name === req.name && file.extension === req.extension
