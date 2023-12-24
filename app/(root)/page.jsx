@@ -10,7 +10,7 @@ export default function Home() {
       <Grid container>
         {homeList.map(item => {
           return (
-            <Grid item xs={4}>
+            <Grid key={item} xs={4}>
               <Link href={item.href} className="disableLinkStyle" prefetch >
                 <Box className="Box">
                   {item.icon}
