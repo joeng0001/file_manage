@@ -78,13 +78,7 @@ export default function ck(props) {
 
         clearRef.current.addEventListener('click', function (e) {
             canvas.clear()
-            fabric.Image.fromURL(url, (img) => {
-                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
-                    scaleX: canvas.width / img.width,
-                    scaleY: canvas.height / img.height
-                });
-            });
-
+            fetchFileContent(canvas)
         });
         fetchFileContent(canvas)
     }
