@@ -1,9 +1,9 @@
 # docker
     docker-compose up
-
+    
 # url
     localhost:3000
-
+    config lib/database.js, update db url if db running at localhost
 # ubuntu
     npm install
     npm run build
