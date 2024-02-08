@@ -1,0 +1,15 @@
+services:
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: file
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
