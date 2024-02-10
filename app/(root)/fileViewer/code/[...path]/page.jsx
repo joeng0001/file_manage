@@ -94,11 +94,11 @@ export default function showByLanguage({ params, searchParams }) {
                 controlSnackbar(true, 'error', e.message)
             });
         if (res.content) {
-            await editorRef.current.editor.setValue(atob(res.content))
+            await editorRef?.current?.editor?.setValue(atob(res.content))
         } else {
-            await editorRef.current.editor.setValue("")
+            await editorRef?.current?.editor?.setValue("")
         }
-        await editorRef.current.editor.gotoLine(1)
+        await editorRef?.current?.editor?.gotoLine(1)
 
     }
     const saveComments = async () => {
@@ -121,7 +121,7 @@ export default function showByLanguage({ params, searchParams }) {
         await fetch('/api/file',
             {
                 method: "PUT",
-                body: JSON.stringify({ path, name, type, base64String: btoa(editorRef.current.editor.getValue()) })
+                body: JSON.stringify({ path, name, type, base64String: btoa(editorRef?.current?.editor?.getValue()) })
             }).then(res => {
                 controlSnackbar(true, "success", "content saved")
             }).catch(err => {

@@ -1,14 +1,22 @@
 "use client"
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Autocomplete, Tooltip } from "@mui/material"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { PiFolderPlusBold, PiFilePlusBold } from 'react-icons/pi'
 import { MdComment, MdFileUpload } from 'react-icons/md'
 import ApiLoading from "@/components/ApiLoading"
 import { BsArrowLeftSquareFill, BsArrowRightSquareFill } from 'react-icons/bs'
 import { fileTypeOption } from '@/lib/constant'
-import { cyan, pink, lightGreen, purple, brown, lightBlue } from '@mui/material/colors'
+import { cyan, pink, lightGreen, purple, brown, lightBlue, blueGrey } from '@mui/material/colors'
+import Snackbar from "@/components/Snackbar"
+import { useRouter, useSearchParams, useParams } from "next/navigation"
+export default function toolbar() {
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    const params = useParams()
+    const path = params.path.join('/')
+    let fileExtension = fileTypeOption[0].extension
+    const page = searchParams.get('page')
 
-export default function toolbar(props) {
     const [fileDialog, setFileDialog] = useState(false)
     const [folderDialog, setFolderDialog] = useState(false)
     const [confirmUploadDialog, setConfirmUploadDialog] = useState(false)
@@ -16,7 +24,34 @@ export default function toolbar(props) {
     const [confirmDeleteDialog, setConfirmDeleteDialog] = useState(false)
     const [loading, setLoading] = useState(false)
     const [file, setFile] = useState({})
-    let fileExtension = fileTypeOption[0].extension
+
+    const [snackbarOpen, setSnackbarOpen] = useState(false)
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success')
+    const [snackbarMessage, setSnackbarMessage] = useState("")
+    const [comments, setComments] = useState("")
+
+    const nextPage = () => {
+        router.push(`/folderViewer/${path}?page=${page * 1 + 1}`)
+    }
+    const lastPage = () => {
+        if (page <= 1) return null
+        router.push(`/folderViewer/${path}?page=${page * 1 - 1}`)
+    }
+
+    const controlSnackbar = (open, severity, message) => {
+        setSnackbarSeverity(severity)
+        setSnackbarMessage(message)
+        setSnackbarOpen(open)
+    }
+
+    const fetchComments = async () => {
+        const res = await fetch(`/api/folder?path=${path}&page=${page}`)
+        const real_res = await res.json()
+        setComments(real_res.comments)
+    }
+    useEffect(() => {
+        fetchComments()
+    }, [page])
 
     const [uploadButtonRef, fileRef, folderRef, fileCommentRef, folderCommentRef, commentsRef, confirmFileCommentRef] = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef(), useRef()]
     const createFile = async () => {
@@ -27,16 +62,16 @@ export default function toolbar(props) {
                 body: JSON.stringify({
                     name: fileRef.current.value + fileExtension,
                     extension: fileExtension,
-                    path: props.path,
+                    path: path,
                     comment: fileCommentRef.current.value,
                     base64String: btoa("")
                 })
             }).then(res => {
-                props.controlSnackbar(true, "success", "empty file created")
+                controlSnackbar(true, "success", "empty file created")
                 setFileDialog(false)
-                props.fetchData()
+                router.refresh();
             }).catch(err => {
-                props.controlSnackbar(true, "error", "Error!" + err.message)
+                controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
                 setLoading(false)
             })
@@ -48,15 +83,15 @@ export default function toolbar(props) {
                 method: "POST",
                 body: JSON.stringify({
                     name: folderRef.current.value,
-                    path: props.path,
+                    path: path,
                     comments: folderCommentRef.current.value
                 })
             }).then(res => {
-                props.controlSnackbar(true, "success", "empty folder created")
+                controlSnackbar(true, "success", "empty folder created")
                 setFolderDialog(false)
-                props.fetchData()
+                router.refresh();
             }).catch(err => {
-                props.controlSnackbar(true, "error", "Error!" + err.message)
+                controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
                 setLoading(false)
             })
@@ -68,12 +103,11 @@ export default function toolbar(props) {
             reader.readAsDataURL(e.target.files[0]);
             reader.onload = async () => {
                 let base64String = reader.result.split(',')[1];
-
                 setFile({
                     name: targetFile.name,
                     extension: '.' + targetFile.name.split('.').slice(-1)[0],//extension
                     base64String: base64String,
-                    path: props.path,
+                    path: path,
                 })
 
                 setConfirmUploadDialog(true)
@@ -87,11 +121,11 @@ export default function toolbar(props) {
                 method: "POST",
                 body: JSON.stringify({ ...file, comments: confirmFileCommentRef.current.value })
             }).then(res => {
-                props.controlSnackbar(true, "success", "file uploaded")
+                controlSnackbar(true, "success", "file uploaded")
                 setConfirmUploadDialog(false)
-                props.fetchData()
+                router.refresh();
             }).catch(err => {
-                props.controlSnackbar(true, "error", "Error!" + err.message)
+                controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
                 setFile(null)
                 setLoading(false)
@@ -99,7 +133,7 @@ export default function toolbar(props) {
     }
     const cancelUpload = () => {
         setFile(null)
-        props.controlSnackbar(true, "warning", "Upload Cancelled")
+        controlSnackbar(true, "warning", "Upload Cancelled")
         setConfirmUploadDialog(false)
     }
     const saveComments = async () => {
@@ -107,12 +141,12 @@ export default function toolbar(props) {
         await fetch('/api/folder',
             {
                 method: "PUT",
-                body: JSON.stringify({ comments: commentsRef.current.value, path: props.path })
+                body: JSON.stringify({ comments: commentsRef.current.value, path: path })
             }).then(res => {
-                props.controlSnackbar(true, "success", "Comment Saved")
-                props.fetchComments()
+                controlSnackbar(true, "success", "Comment Saved")
+                fetchComments()
             }).catch(err => {
-                props.controlSnackbar(true, "error", "Error!" + err.message)
+                controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
                 setCommentsDialog(false)
                 setLoading(false)
@@ -135,12 +169,12 @@ export default function toolbar(props) {
         await fetch('/api/folder',
             {
                 method: "DELETE",
-                body: JSON.stringify({ path: props.path })
+                body: JSON.stringify({ path: path })
             }).then(res => {
-                props.controlSnackbar(true, "success", "folder deleted")
-                props.fetchData()
+                controlSnackbar(true, "success", "folder deleted")
+                router.refresh()
             }).catch(err => {
-                props.controlSnackbar(true, "error", "Error!" + err.message)
+                controlSnackbar(true, "error", "Error!" + err.message)
             }).finally(() => {
                 setConfirmDeleteDialog(false)
                 setLoading(false)
@@ -148,35 +182,32 @@ export default function toolbar(props) {
     }
 
     return (
-
-        <div>
+        <>
             <div className="toolbar">
-
                 <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: brown[400] }} onClick={() => setFileDialog(true)}><PiFilePlusBold />Create File</Button>
                 <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: lightBlue[400] }} onClick={() => setFolderDialog(true)}><PiFolderPlusBold />Create Folder</Button>
                 <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: cyan[400] }} onClick={() => { uploadButtonRef.current.click() }}>
                     <MdFileUpload />Upload File
                     <input ref={uploadButtonRef} type='file' accept=".jpg, .pdf, .png, .cs,.java,.py,.html,.css,.js,.php,.rb,.swift,.rs,.txt,.doc,.docx"
                         onChange={(e) => fileSelect(e)} className="HidedButton" />
-
                 </Button>
                 <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: pink[400] }} onClick={() => setConfirmDeleteDialog(true)}>Delete</Button>
                 <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: lightGreen[400] }} onClick={() => setCommentsDialog(true)}><MdComment />Edit Comment</Button>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button onClick={() => props.lastPage()} variant="contained" style={{ marginRight: '5px', backgroundColor: purple[400] }}>
+                <div style={{ marginBottom: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                    <Button onClick={() => lastPage()} variant="contained" style={{ marginRight: '5px', backgroundColor: purple[400] }}>
                         <BsArrowLeftSquareFill size={20} />
                         <span style={{ marginLeft: '10px' }}>
                             Last Page
                         </span>
                     </Button>
-                    <Button onClick={() => props.nextPage()} variant="contained" style={{ marginLeft: '5px', backgroundColor: purple[400] }}>
+                    <Button onClick={() => nextPage()} variant="contained" style={{ marginLeft: '5px', backgroundColor: purple[400] }}>
                         <span style={{ marginRight: '10px' }}> Next Page</span>
                         <BsArrowRightSquareFill size={20} />
                     </Button>
                 </div>
+                <Button variant="contained" style={{ marginBottom: '10px', backgroundColor: blueGrey[400] }} onClick={() => router.back()}><MdComment />Back</Button>
             </div>
             <Dialog
-
                 fullWidth={true}
                 maxWidth='sm'
                 open={fileDialog}
@@ -220,7 +251,6 @@ export default function toolbar(props) {
                 <DialogTitle>
                     Create Folder
                 </DialogTitle>
-
                 {
                     loading ?
                         <DialogContent>
@@ -287,7 +317,7 @@ export default function toolbar(props) {
                         :
                         <div>
                             <DialogContent>
-                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth defaultValue={props.comments} />
+                                <TextField inputRef={commentsRef} label="Comment" variant="outlined" color="secondary" multiline rows={4} fullWidth defaultValue={comments} />
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setCommentsDialog(false)}>Back</Button>
@@ -312,7 +342,7 @@ export default function toolbar(props) {
                         :
                         <div>
                             <DialogContent>
-                                Delete folder <span style={{ fontSize: '24px', fontWeight: '200', color: 'red' }}>{props.path.split('/').pop()}</span> will delete all Folders And Files inside it!
+                                Delete folder <span style={{ fontSize: '24px', fontWeight: '200', color: 'red' }}>{path.split('/').pop()}</span> will delete all Folders And Files inside it!
                             </DialogContent>
                             <DialogActions>
                                 <Button onClick={() => setConfirmDeleteDialog(false)}>Cancel</Button>
@@ -321,7 +351,7 @@ export default function toolbar(props) {
                         </div>
                 }
             </Dialog>
-        </div>
-
+            <Snackbar setSnackbarOpen={setSnackbarOpen} snackbarOpen={snackbarOpen} snackbarSeverity={snackbarSeverity} snackbarMessage={snackbarMessage} />
+        </>
     )
 }
